@@ -115,7 +115,7 @@ jobs:
           ./configure --without-gui --with-incompatible-bdb --disable-zmq --disable-tests \
             --with-boost="$BOOST_ROOT" \
             CPPFLAGS="$BDB_CFLAGS" LDFLAGS="$BDB_LIBS"
-          make -j$(nproc)
+          make -j$(sysctl -n hw.ncpu)
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
