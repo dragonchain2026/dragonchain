@@ -104,7 +104,9 @@ jobs:
           ./autogen.sh
           export BDB_CFLAGS="-I$(brew --prefix berkeley-db@4)/include"
           export BDB_LIBS="-L$(brew --prefix berkeley-db@4)/lib -ldb_cxx-4.8"
+          export BOOST_ROOT="$(brew --prefix boost)"
           ./configure --without-gui --with-incompatible-bdb --disable-zmq --disable-tests \
+            --with-boost="$BOOST_ROOT" \
             CPPFLAGS="$BDB_CFLAGS" LDFLAGS="$BDB_LIBS"
           make -j$(nproc)
 
