@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MiningPage</class>
+ <widget class="QWidget" name="MiningPage">
+  <property name="geometry">
+   <rect><x>0</x><y>0</y><width>500</width><height>480</height></rect>
+  </property>
+  <layout class="QVBoxLayout" name="mainLayout">
+   <item>
+    <widget class="QGroupBox" name="statusGroup">
+     <property name="title"><string>Mining Status</string></property>
+     <layout class="QGridLayout" name="statusGrid">
+      <item row="0" column="0">
+       <widget class="QLabel" name="statusLabel_"><property name="text"><string>Status:</string></property></widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="miningStatusLabel">
+        <property name="text"><string>Stopped</string></property>
+        <property name="styleSheet"><string>font-weight: bold; color: #888;</string></property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="addressLabel_"><property name="text"><string>Address:</string></property></widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="miningAddressEdit">
+        <property name="readOnly"><bool>true</bool></property>
+        <property name="placeholderText"><string>No address configured</string></property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="threadsLabel_"><property name="text"><string>Threads:</string></property></widget>
+      </item>
+      <item row="2" column="1">
+       <layout class="QHBoxLayout" name="threadsLayout">
+        <item>
+         <widget class="QSlider" name="threadsSlider">
+          <property name="minimum"><number>1</number></property>
+          <property name="maximum"><number>8</number></property>
+          <property name="value"><number>1</number></property>
+          <property name="orientation"><enum>Qt::Horizontal</enum></property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="threadsValueLabel">
+          <property name="text"><string>1</string></property>
+          <property name="minimumSize"><size><width>20</width><height>0</height></size></property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="statsGroup">
+     <property name="title"><string>Statistics</string></property>
+     <layout class="QGridLayout" name="statsGrid">
+      <item row="0" column="0">
+       <widget class="QLabel" name="localHashLabel_"><property name="text"><string>Local Hashrate:</string></property></widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="localHashrateLabel">
+        <property name="text"><string>0 H/s</string></property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="networkHashLabel_"><property name="text"><string>Network Hashrate:</string></property></widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLabel" name="networkHashrateLabel">
+        <property name="text"><string>0 H/s</string></property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="difficultyLabel_"><property name="text"><string>Difficulty:</string></property></widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLabel" name="difficultyLabel">
+        <property name="text"><string>0</string></property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="blocksMinedLabel_"><property name="text"><string>Blocks Mined:</string></property></widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLabel" name="blocksMinedLabel">
+        <property name="text"><string>0</string></property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="uptimeLabel_"><property name="text"><string>Uptime:</string></property></widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLabel" name="uptimeLabel">
+        <property name="text"><string>00:00:00</string></property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="buttonLayout">
+     <item>
+      <widget class="QPushButton" name="startMiningButton">
+       <property name="text"><string>Start Mining</string></property>
+       <property name="enabled"><bool>true</bool></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="stopMiningButton">
+       <property name="text"><string>Stop Mining</string></property>
+       <property name="enabled"><bool>false</bool></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="configureButton">
+       <property name="text"><string>Configure Address</string></property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="logGroup">
+     <property name="title"><string>Mining Log</string></property>
+     <layout class="QVBoxLayout" name="logLayout">
+      <item>
+       <widget class="QPlainTextEdit" name="miningLogWidget">
+        <property name="readOnly"><bool>true</bool></property>
+        <property name="maximumBlockCount"><number>500</number></property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+</ui>
