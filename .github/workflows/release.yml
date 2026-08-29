@@ -108,7 +108,10 @@ jobs:
           # boost >= 1.69 makes boost_system header-only (no libboost_system file),
           # but the old AX_BOOST_SYSTEM macro still searches for the library.
           # Create an empty archive so the check passes (header-only needs no link).
-          [ -f "$BOOST_ROOT/lib/libboost_system.a" ] || ar rcs "$BOOST_ROOT/lib/libboost_system.a"
+          if [ ! -f "$BOOST_ROOT/lib/libboost_system.a" ]; then
+            echo '' | cc -x c -c -o /tmp/empty.o -
+            ar rcs "$BOOST_ROOT/lib/libboost_system.a" /tmp/empty.o
+          fi
           ./configure --without-gui --with-incompatible-bdb --disable-zmq --disable-tests \
             --with-boost="$BOOST_ROOT" \
             CPPFLAGS="$BDB_CFLAGS" LDFLAGS="$BDB_LIBS"
