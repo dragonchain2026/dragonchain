@@ -8,9 +8,9 @@
 
 #include <threadsafety.h>
 
+#include <mutex>
 #include <condition_variable>
 #include <thread>
-#include <mutex>
 
 
 ////////////////////////////////////////////////
