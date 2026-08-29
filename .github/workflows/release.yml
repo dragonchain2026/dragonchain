@@ -28,7 +28,7 @@ jobs:
       - name: Build
         run: |
           ./autogen.sh
-          ./configure --without-gui --with-incompatible-bdb --disable-zmq
+          ./configure --without-gui --with-incompatible-bdb --disable-zmq --disable-tests
           make -j$(nproc)
 
       - name: Upload artifact
@@ -69,7 +69,7 @@ jobs:
           ./autogen.sh
           CONFIG_SITE=$PWD/depends/x86_64-w64-mingw32/share/config.site \
             ./configure --prefix=$PWD/depends/x86_64-w64-mingw32 \
-            --disable-shared --without-gui --disable-zmq
+            --disable-shared --without-gui --disable-zmq --disable-tests
 
       - name: Build
         run: make -j$(nproc)
@@ -102,7 +102,7 @@ jobs:
           ./autogen.sh
           export BDB_CFLAGS="-I$(brew --prefix berkeley-db@4)/include"
           export BDB_LIBS="-L$(brew --prefix berkeley-db@4)/lib -ldb_cxx-4.8"
-          ./configure --without-gui --with-incompatible-bdb --disable-zmq \
+          ./configure --without-gui --with-incompatible-bdb --disable-zmq --disable-tests \
             CPPFLAGS="$BDB_CFLAGS" LDFLAGS="$BDB_LIBS"
           make -j$(nproc)
 
