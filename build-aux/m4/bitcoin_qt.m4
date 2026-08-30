@@ -388,23 +388,9 @@ AC_DEFUN([_BITCOIN_QT_FIND_STATIC_PLUGINS],[
      ])
      else
        if test "x$TARGET_OS" = xwindows; then
-         AC_CACHE_CHECK(for Qt >= 5.6, bitcoin_cv_need_platformsupport,[
-           AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
-               #include <QtCore/qconfig.h>
-               #ifndef QT_VERSION
-               #  include <QtCore/qglobal.h>
-               #endif
-             ]],
-             [[
-               #if QT_VERSION < 0x050600
-               choke
-               #endif
-             ]])],
-           [bitcoin_cv_need_platformsupport=yes],
-           [bitcoin_cv_need_platformsupport=no])
-         ])
-         dnl Qt >= 5.15 no longer ships libQt5PlatformSupport (removed upstream).
-         dnl The old Bitcoin Core 0.17 check would fail, so skip it.
+         dnl Qt 5.15 split Qt5PlatformSupport into several support libraries.
+         dnl pkg-config is disabled for MinGW, so link them explicitly.
+         QT_LIBS="$QT_LIBS -lQt5AccessibilitySupport -lQt5DeviceDiscoverySupport -lQt5EdidSupport -lQt5EventDispatcherSupport -lQt5FbSupport -lQt5FontDatabaseSupport -lQt5ThemeSupport -lQt5WindowsUIAutomationSupport"
        fi
      fi
   else
