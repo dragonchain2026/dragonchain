@@ -387,9 +387,8 @@ AC_DEFUN([_BITCOIN_QT_FIND_STATIC_PLUGINS],[
            [bitcoin_cv_need_platformsupport=yes],
            [bitcoin_cv_need_platformsupport=no])
          ])
-         if test "x$bitcoin_cv_need_platformsupport" = xyes; then
-           BITCOIN_QT_CHECK(AC_CHECK_LIB([${QT_LIB_PREFIX}PlatformSupport],[main],,BITCOIN_QT_FAIL(lib${QT_LIB_PREFIX}PlatformSupport not found)))
-         fi
+         dnl Qt >= 5.15 no longer ships libQt5PlatformSupport (removed upstream).
+         dnl The old Bitcoin Core 0.17 check would fail, so skip it.
        fi
      fi
   else
