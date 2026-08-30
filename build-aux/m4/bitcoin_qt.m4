@@ -367,7 +367,16 @@ AC_DEFUN([_BITCOIN_QT_FIND_STATIC_PLUGINS],[
      if test "x$use_pkgconfig" = xyes; then
      : dnl
      m4_ifdef([PKG_CHECK_MODULES],[
-       PKG_CHECK_MODULES([QTPLATFORM], [Qt5PlatformSupport], [QT_LIBS="$QTPLATFORM_LIBS $QT_LIBS"])
+       PKG_CHECK_MODULES([QT_ACCESSIBILITY], [Qt5AccessibilitySupport], [QT_LIBS="$QT_ACCESSIBILITY_LIBS $QT_LIBS"])
+       PKG_CHECK_MODULES([QT_DEVICEDISCOVERY], [Qt5DeviceDiscoverySupport], [QT_LIBS="$QT_DEVICEDISCOVERY_LIBS $QT_LIBS"])
+       PKG_CHECK_MODULES([QT_EDID], [Qt5EdidSupport], [QT_LIBS="$QT_EDID_LIBS $QT_LIBS"])
+       PKG_CHECK_MODULES([QT_EVENTDISPATCHER], [Qt5EventDispatcherSupport], [QT_LIBS="$QT_EVENTDISPATCHER_LIBS $QT_LIBS"])
+       PKG_CHECK_MODULES([QT_FB], [Qt5FbSupport], [QT_LIBS="$QT_FB_LIBS $QT_LIBS"])
+       PKG_CHECK_MODULES([QT_FONTDATABASE], [Qt5FontDatabaseSupport], [QT_LIBS="$QT_FONTDATABASE_LIBS $QT_LIBS"])
+       PKG_CHECK_MODULES([QT_THEME], [Qt5ThemeSupport], [QT_LIBS="$QT_THEME_LIBS $QT_LIBS"])
+       if test "x$TARGET_OS" = xwindows; then
+         PKG_CHECK_MODULES([QT_WINDOWSUIAUTOMATION], [Qt5WindowsUIAutomationSupport], [QT_LIBS="$QT_WINDOWSUIAUTOMATION_LIBS $QT_LIBS"])
+       fi
        if test "x$TARGET_OS" = xlinux; then
          PKG_CHECK_MODULES([X11XCB], [x11-xcb], [QT_LIBS="$X11XCB_LIBS $QT_LIBS"])
          if ${PKG_CONFIG} --exists "Qt5Core >= 5.5" 2>/dev/null; then
