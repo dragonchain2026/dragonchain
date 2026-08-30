@@ -390,7 +390,7 @@ AC_DEFUN([_BITCOIN_QT_FIND_STATIC_PLUGINS],[
        if test "x$TARGET_OS" = xwindows; then
          dnl Qt 5.15 split Qt5PlatformSupport into several support libraries.
          dnl pkg-config is disabled for MinGW, so link them explicitly.
-         QT_LIBS="$QT_LIBS -lQt5AccessibilitySupport -lQt5DeviceDiscoverySupport -lQt5EdidSupport -lQt5EventDispatcherSupport -lQt5FbSupport -lQt5FontDatabaseSupport -lQt5ThemeSupport -lQt5WindowsUIAutomationSupport"
+         QT_LIBS="$QT_LIBS -lQt5AccessibilitySupport -lQt5DeviceDiscoverySupport -lQt5EdidSupport -lQt5EventDispatcherSupport -lQt5FbSupport -lQt5FontDatabaseSupport -lQt5ThemeSupport -lQt5WindowsUIAutomationSupport -lqtlibpng -ldwmapi"
        fi
      fi
   else
