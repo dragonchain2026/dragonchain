@@ -23,12 +23,13 @@ jobs:
             bsdmainutils python3 libssl-dev libevent-dev \
             libboost-system-dev libboost-filesystem-dev libboost-chrono-dev \
             libboost-program-options-dev libboost-test-dev libboost-thread-dev \
-            libdb++-dev libminiupnpc-dev libzmq3-dev libprotobuf-dev protobuf-compiler
+            libdb++-dev libminiupnpc-dev libzmq3-dev libprotobuf-dev protobuf-compiler \
+            qtbase5-dev qt5-qmake libqt5dbus5-dev libqt5gui5
 
       - name: Build
         run: |
           ./autogen.sh
-          ./configure --without-gui --with-incompatible-bdb --disable-zmq --disable-tests
+          ./configure --with-gui=qt5 --with-incompatible-bdb --disable-zmq --disable-tests
           make -j$(nproc)
 
       - name: Upload artifact
@@ -39,6 +40,7 @@ jobs:
             src/dragonchaind
             src/dragonchain-cli
             src/dragonchain-tx
+            src/qt/dragonchain-qt
           retention-days: 30
 
   build-windows:
@@ -61,17 +63,17 @@ jobs:
         uses: actions/cache@v4
         with:
           path: depends/built
-          key: depends-mingw32-${{ hashFiles('depends/packages/*.mk') }}
+          key: depends-mingw32-qt-${{ hashFiles('depends/packages/*.mk') }}
 
       - name: Build dependencies (depends)
-        run: make -C depends HOST=x86_64-w64-mingw32 -j$(nproc) NO_QT=1
+        run: make -C depends HOST=x86_64-w64-mingw32 -j$(nproc)
 
       - name: Configure
         run: |
           ./autogen.sh
           CONFIG_SITE=$PWD/depends/x86_64-w64-mingw32/share/config.site \
             ./configure --prefix=$PWD/depends/x86_64-w64-mingw32 \
-            --disable-shared --without-gui --disable-zmq --disable-tests
+            --disable-shared --with-gui=qt5 --disable-zmq --disable-tests
 
       - name: Build
         run: make -j$(nproc)
@@ -84,6 +86,7 @@ jobs:
             src/dragonchaind.exe
             src/dragonchain-cli.exe
             src/dragonchain-tx.exe
+            src/qt/dragonchain-qt.exe
           retention-days: 30
 
   build-macos:
@@ -97,7 +100,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          brew install automake libtool boost miniupnpc openssl pkg-config libevent berkeley-db@4
+          brew install automake libtool boost miniupnpc openssl pkg-config libevent berkeley-db@4 qt@5
 
       - name: Build
         run: |
@@ -105,6 +108,8 @@ jobs:
           export BDB_CFLAGS="-I$(brew --prefix berkeley-db@4)/include"
           export BDB_LIBS="-L$(brew --prefix berkeley-db@4)/lib -ldb_cxx-4.8"
           export BOOST_ROOT="$(brew --prefix boost)"
+          export QT5_PREFIX="$(brew --prefix qt@5)"
+          export PKG_CONFIG_PATH="$QT5_PREFIX/lib/pkgconfig:$PKG_CONFIG_PATH"
           # boost >= 1.69 makes boost_system header-only (no libboost_system file),
           # but the old AX_BOOST_SYSTEM macro still searches for the library.
           # Create an empty archive so the check passes (header-only needs no link).
@@ -112,7 +117,7 @@ jobs:
             echo '' | cc -x c -c -o /tmp/empty.o -
             ar rcs "$BOOST_ROOT/lib/libboost_system.a" /tmp/empty.o
           fi
-          ./configure --without-gui --with-incompatible-bdb --disable-zmq --disable-tests \
+          ./configure --with-gui=qt5 --with-incompatible-bdb --disable-zmq --disable-tests \
             --with-boost="$BOOST_ROOT" \
             CPPFLAGS="$BDB_CFLAGS" LDFLAGS="$BDB_LIBS"
           make -j$(sysctl -n hw.ncpu)
@@ -125,6 +130,7 @@ jobs:
             src/dragonchaind
             src/dragonchain-cli
             src/dragonchain-tx
+            src/qt/dragonchain-qt
           retention-days: 30
 
   release:
