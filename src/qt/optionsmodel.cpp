@@ -23,7 +23,9 @@
 #include <wallet/walletdb.h>
 #endif
 
+#ifndef QT_NO_NETWORKPROXY
 #include <QNetworkProxy>
+#endif
 #include <QSettings>
 #include <QStringList>
 
@@ -450,6 +452,7 @@ void OptionsModel::setDisplayUnit(const QVariant &value)
     }
 }
 
+#ifndef QT_NO_NETWORKPROXY
 bool OptionsModel::getProxySettings(QNetworkProxy& proxy) const
 {
     // Directly query current base proxy, because
@@ -467,6 +470,7 @@ bool OptionsModel::getProxySettings(QNetworkProxy& proxy) const
 
     return false;
 }
+#endif
 
 void OptionsModel::setRestartRequired(bool fRequired)
 {
