@@ -123,9 +123,6 @@ public Q_SLOTS:
 private Q_SLOTS:
     void handleURIConnection();
     void netRequestFinished(QNetworkReply*);
-#ifndef QT_NO_SSL
-    void reportSslErrors(QNetworkReply*, const QList<QSslError> &);
-#endif
     void handlePaymentACK(const QString& paymentACKMsg);
 
 protected:

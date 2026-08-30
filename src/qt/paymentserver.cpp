@@ -391,10 +391,6 @@ void PaymentServer::initNetManager()
 
     connect(netManager, SIGNAL(finished(QNetworkReply*)),
             this, SLOT(netRequestFinished(QNetworkReply*)));
-#ifndef QT_NO_SSL
-    connect(netManager, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> &)),
-            this, SLOT(reportSslErrors(QNetworkReply*, const QList<QSslError> &)));
-#endif
 }
 
 void PaymentServer::uiReady()
@@ -744,19 +740,6 @@ void PaymentServer::netRequestFinished(QNetworkReply* reply)
     }
 }
 
-#ifndef QT_NO_SSL
-void PaymentServer::reportSslErrors(QNetworkReply* reply, const QList<QSslError> &errs)
-{
-    Q_UNUSED(reply);
-
-    QString errString;
-    for (const QSslError& err : errs) {
-        qWarning() << "PaymentServer::reportSslErrors: " << err;
-        errString += err.errorString() + "\n";
-    }
-    Q_EMIT message(tr("Network request error"), errString, CClientUIInterface::MSG_ERROR);
-}
-#endif
 
 void PaymentServer::setOptionsModel(OptionsModel *_optionsModel)
 {
