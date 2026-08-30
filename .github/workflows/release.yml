@@ -24,7 +24,7 @@ jobs:
             libboost-system-dev libboost-filesystem-dev libboost-chrono-dev \
             libboost-program-options-dev libboost-test-dev libboost-thread-dev \
             libdb++-dev libminiupnpc-dev libzmq3-dev libprotobuf-dev protobuf-compiler \
-            qtbase5-dev qt5-qmake libqt5dbus5-dev libqt5gui5
+            qtbase5-dev qt5-qmake libqt5gui5
 
       - name: Build
         run: |
@@ -63,17 +63,17 @@ jobs:
         uses: actions/cache@v4
         with:
           path: depends/built
-          key: depends-mingw32-qt-${{ hashFiles('depends/packages/*.mk') }}
+          key: depends-mingw32-${{ hashFiles('depends/packages/*.mk') }}
 
       - name: Build dependencies (depends)
-        run: make -C depends HOST=x86_64-w64-mingw32 -j$(nproc)
+        run: make -C depends HOST=x86_64-w64-mingw32 -j$(nproc) NO_QT=1
 
       - name: Configure
         run: |
           ./autogen.sh
           CONFIG_SITE=$PWD/depends/x86_64-w64-mingw32/share/config.site \
             ./configure --prefix=$PWD/depends/x86_64-w64-mingw32 \
-            --disable-shared --with-gui=qt5 --disable-zmq --disable-tests
+            --disable-shared --without-gui --disable-zmq --disable-tests
 
       - name: Build
         run: make -j$(nproc)
@@ -86,7 +86,6 @@ jobs:
             src/dragonchaind.exe
             src/dragonchain-cli.exe
             src/dragonchain-tx.exe
-            src/qt/dragonchain-qt.exe
           retention-days: 30
 
   build-macos:
@@ -100,7 +99,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          brew install automake libtool boost miniupnpc openssl pkg-config libevent berkeley-db@4 qt@5
+          brew install automake libtool boost miniupnpc openssl pkg-config libevent berkeley-db@4 qt@5 protobuf
 
       - name: Build
         run: |
