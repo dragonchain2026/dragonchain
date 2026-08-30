@@ -74,7 +74,7 @@ jobs:
           CONFIG_SITE=$PWD/depends/x86_64-w64-mingw32/share/config.site \
             ./configure --prefix=$PWD/depends/x86_64-w64-mingw32 \
             --disable-shared --with-gui=qt5 --disable-zmq --disable-tests \
-            || { echo "=== config.log tail ==="; tail -150 config.log; exit 1; }
+            || { echo "=== config.log qwindows link ==="; grep -n -A25 "conftest.*qwindows\|-lqwindows" config.log | tail -80; exit 1; }
 
       - name: Build
         run: make -j$(nproc)
