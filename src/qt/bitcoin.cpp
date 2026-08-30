@@ -50,7 +50,9 @@
 #include <QThread>
 #include <QTimer>
 #include <QTranslator>
+#ifndef QT_NO_SSL
 #include <QSslConfiguration>
+#endif
 
 #if defined(QT_STATICPLUGIN)
 #include <QtPlugin>
@@ -627,7 +629,7 @@ int main(int argc, char *argv[])
 #ifdef Q_OS_MAC
     QApplication::setAttribute(Qt::AA_DontShowIconsInMenus);
 #endif
-#if QT_VERSION >= 0x050500
+#if QT_VERSION >= 0x050500 && !defined(QT_NO_SSL)
     // Because of the POODLE attack it is recommended to disable SSLv3 (https://disablessl3.com/),
     // so set SSL protocols to TLS1.0+.
     QSslConfiguration sslconf = QSslConfiguration::defaultConfiguration();
