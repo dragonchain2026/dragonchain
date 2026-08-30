@@ -63,17 +63,17 @@ jobs:
         uses: actions/cache@v4
         with:
           path: depends/built
-          key: depends-mingw32-${{ hashFiles('depends/packages/*.mk') }}
+          key: depends-mingw32-qt515-${{ hashFiles('depends/packages/*.mk') }}
 
       - name: Build dependencies (depends)
-        run: make -C depends HOST=x86_64-w64-mingw32 -j$(nproc) NO_QT=1
+        run: make -C depends HOST=x86_64-w64-mingw32 -j$(nproc)
 
       - name: Configure
         run: |
           ./autogen.sh
           CONFIG_SITE=$PWD/depends/x86_64-w64-mingw32/share/config.site \
             ./configure --prefix=$PWD/depends/x86_64-w64-mingw32 \
-            --disable-shared --without-gui --disable-zmq --disable-tests
+            --disable-shared --with-gui=qt5 --disable-zmq --disable-tests
 
       - name: Build
         run: make -j$(nproc)
@@ -86,6 +86,7 @@ jobs:
             src/dragonchaind.exe
             src/dragonchain-cli.exe
             src/dragonchain-tx.exe
+            src/qt/dragonchain-qt.exe
           retention-days: 30
 
   build-macos:
