@@ -24,7 +24,7 @@ jobs:
             libboost-system-dev libboost-filesystem-dev libboost-chrono-dev \
             libboost-program-options-dev libboost-test-dev libboost-thread-dev \
             libdb++-dev libminiupnpc-dev libzmq3-dev libprotobuf-dev protobuf-compiler \
-            qtbase5-dev qt5-qmake libqt5gui5
+            qtbase5-dev qt5-qmake libqt5gui5 qttools5-dev-tools
 
       - name: Build
         run: |
@@ -99,7 +99,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          brew install automake libtool boost miniupnpc openssl pkg-config libevent berkeley-db@4 qt@5 protobuf
+          brew install automake libtool boost miniupnpc openssl pkg-config libevent berkeley-db@4 qt@5 protobuf@21
 
       - name: Build
         run: |
@@ -108,7 +108,8 @@ jobs:
           export BDB_LIBS="-L$(brew --prefix berkeley-db@4)/lib -ldb_cxx-4.8"
           export BOOST_ROOT="$(brew --prefix boost)"
           export QT5_PREFIX="$(brew --prefix qt@5)"
-          export PKG_CONFIG_PATH="$QT5_PREFIX/lib/pkgconfig:$PKG_CONFIG_PATH"
+          export PROTOBUF_PREFIX="$(brew --prefix protobuf@21)"
+          export PKG_CONFIG_PATH="$QT5_PREFIX/lib/pkgconfig:$PROTOBUF_PREFIX/lib/pkgconfig:$PKG_CONFIG_PATH"
           # boost >= 1.69 makes boost_system header-only (no libboost_system file),
           # but the old AX_BOOST_SYSTEM macro still searches for the library.
           # Create an empty archive so the check passes (header-only needs no link).
