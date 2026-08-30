@@ -143,6 +143,9 @@ AC_DEFUN([BITCOIN_QT_CONFIGURE],[
         AC_DEFINE(QT_QPA_PLATFORM_MINIMAL, 1, [Define this symbol if the minimal qt platform exists])
       fi
       if test "x$TARGET_OS" = xwindows; then
+        dnl Linking against wtsapi32 is required for the Qt windows plugin.
+        dnl See #17749 and https://bugreports.qt.io/browse/QTBUG-27097.
+        AX_CHECK_LINK_FLAG([-lwtsapi32], [QT_LIBS="$QT_LIBS -lwtsapi32"], [AC_MSG_ERROR([could not link against -lwtsapi32])])
         _BITCOIN_QT_CHECK_STATIC_PLUGINS([Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)],[-lqwindows])
         AC_DEFINE(QT_QPA_PLATFORM_WINDOWS, 1, [Define this symbol if the qt platform is windows])
       elif test "x$TARGET_OS" = xlinux; then
