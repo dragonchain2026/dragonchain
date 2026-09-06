@@ -56,11 +56,12 @@ private:
     //! Compute the length of a pubkey with a given first byte.
     unsigned int static GetLen(unsigned char chHeader)
     {
-       /* if (chHeader == 2 || chHeader == 3)
-            return COMPRESSED_PUBLIC_KEY_SIZE;
-        if (chHeader == 4 || chHeader == 6 || chHeader == 7)
-            return PUBLIC_KEY_SIZE;*/
-        return PUBLIC_KEY_SIZE;
+        // Falcon-512 public key: single header byte 0x07, fixed PUBLIC_KEY_SIZE bytes.
+        // secp256k1 pubkeys (0x02/0x03 compressed, 0x04/0x06 uncompressed) are no
+        // longer supported — any other header byte is invalid.
+        if (chHeader == 7)
+            return PUBLIC_KEY_SIZE;
+        return 0;
     }
 
     //! Set this key data to be invalid
@@ -140,10 +141,11 @@ public:
     void Unserialize(Stream& s)
     {
         unsigned int len = ::ReadCompactSize(s);
-        if (len <= PUBLIC_KEY_SIZE) {
+        if (len == PUBLIC_KEY_SIZE) {
             s.read((char*)vch, len);
         } else {
-            // invalid pubkey, skip available data
+            // invalid pubkey (Falcon public key is fixed PUBLIC_KEY_SIZE bytes),
+            // skip available data
             char dummy;
             while (len--)
                 s.read(&dummy, 1);

@@ -136,16 +136,9 @@ AC_DEFUN([BITCOIN_QT_CONFIGURE],[
       if test "x$bitcoin_cv_need_acc_widget" = xyes; then
         _BITCOIN_QT_CHECK_STATIC_PLUGINS([Q_IMPORT_PLUGIN(AccessibleFactory)], [-lqtaccessiblewidgets])
       fi
-      if test "x$TARGET_OS" != xwindows; then
-        dnl Qt 5.15 does not build the minimal platform plugin under MinGW.
-        dnl It is only needed for headless operation, so skip it on Windows.
-        _BITCOIN_QT_CHECK_STATIC_PLUGINS([Q_IMPORT_PLUGIN(QMinimalIntegrationPlugin)],[-lqminimal])
-        AC_DEFINE(QT_QPA_PLATFORM_MINIMAL, 1, [Define this symbol if the minimal qt platform exists])
-      fi
+      _BITCOIN_QT_CHECK_STATIC_PLUGINS([Q_IMPORT_PLUGIN(QMinimalIntegrationPlugin)],[-lqminimal])
+      AC_DEFINE(QT_QPA_PLATFORM_MINIMAL, 1, [Define this symbol if the minimal qt platform exists])
       if test "x$TARGET_OS" = xwindows; then
-        dnl Linking against wtsapi32 is required for the Qt windows plugin.
-        dnl See #17749 and https://bugreports.qt.io/browse/QTBUG-27097.
-        AX_CHECK_LINK_FLAG([-lwtsapi32], [QT_LIBS="$QT_LIBS -lwtsapi32"], [AC_MSG_ERROR([could not link against -lwtsapi32])])
         _BITCOIN_QT_CHECK_STATIC_PLUGINS([Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)],[-lqwindows])
         AC_DEFINE(QT_QPA_PLATFORM_WINDOWS, 1, [Define this symbol if the qt platform is windows])
       elif test "x$TARGET_OS" = xlinux; then
@@ -367,16 +360,7 @@ AC_DEFUN([_BITCOIN_QT_FIND_STATIC_PLUGINS],[
      if test "x$use_pkgconfig" = xyes; then
      : dnl
      m4_ifdef([PKG_CHECK_MODULES],[
-       PKG_CHECK_MODULES([QT_ACCESSIBILITY], [Qt5AccessibilitySupport], [QT_LIBS="$QT_ACCESSIBILITY_LIBS $QT_LIBS"])
-       PKG_CHECK_MODULES([QT_DEVICEDISCOVERY], [Qt5DeviceDiscoverySupport], [QT_LIBS="$QT_DEVICEDISCOVERY_LIBS $QT_LIBS"])
-       PKG_CHECK_MODULES([QT_EDID], [Qt5EdidSupport], [QT_LIBS="$QT_EDID_LIBS $QT_LIBS"])
-       PKG_CHECK_MODULES([QT_EVENTDISPATCHER], [Qt5EventDispatcherSupport], [QT_LIBS="$QT_EVENTDISPATCHER_LIBS $QT_LIBS"])
-       PKG_CHECK_MODULES([QT_FB], [Qt5FbSupport], [QT_LIBS="$QT_FB_LIBS $QT_LIBS"])
-       PKG_CHECK_MODULES([QT_FONTDATABASE], [Qt5FontDatabaseSupport], [QT_LIBS="$QT_FONTDATABASE_LIBS $QT_LIBS"])
-       PKG_CHECK_MODULES([QT_THEME], [Qt5ThemeSupport], [QT_LIBS="$QT_THEME_LIBS $QT_LIBS"])
-       if test "x$TARGET_OS" = xwindows; then
-         PKG_CHECK_MODULES([QT_WINDOWSUIAUTOMATION], [Qt5WindowsUIAutomationSupport], [QT_LIBS="$QT_WINDOWSUIAUTOMATION_LIBS $QT_LIBS"])
-       fi
+       PKG_CHECK_MODULES([QTPLATFORM], [Qt5PlatformSupport], [QT_LIBS="$QTPLATFORM_LIBS $QT_LIBS"])
        if test "x$TARGET_OS" = xlinux; then
          PKG_CHECK_MODULES([X11XCB], [x11-xcb], [QT_LIBS="$X11XCB_LIBS $QT_LIBS"])
          if ${PKG_CONFIG} --exists "Qt5Core >= 5.5" 2>/dev/null; then
@@ -388,9 +372,24 @@ AC_DEFUN([_BITCOIN_QT_FIND_STATIC_PLUGINS],[
      ])
      else
        if test "x$TARGET_OS" = xwindows; then
-         dnl Qt 5.15 split Qt5PlatformSupport into several support libraries.
-         dnl pkg-config is disabled for MinGW, so link them explicitly.
-         QT_LIBS="$QT_LIBS -lQt5AccessibilitySupport -lQt5DeviceDiscoverySupport -lQt5EdidSupport -lQt5EventDispatcherSupport -lQt5FbSupport -lQt5FontDatabaseSupport -lQt5ThemeSupport -lQt5WindowsUIAutomationSupport -lqtlibpng -lqtharfbuzz -lqtpcre2 -ldwmapi -lversion -luserenv -lnetapi32"
+         AC_CACHE_CHECK(for Qt >= 5.6, bitcoin_cv_need_platformsupport,[
+           AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+               #include <QtCore/qconfig.h>
+               #ifndef QT_VERSION
+               #  include <QtCore/qglobal.h>
+               #endif
+             ]],
+             [[
+               #if QT_VERSION < 0x050600
+               choke
+               #endif
+             ]])],
+           [bitcoin_cv_need_platformsupport=yes],
+           [bitcoin_cv_need_platformsupport=no])
+         ])
+         if test "x$bitcoin_cv_need_platformsupport" = xyes; then
+           BITCOIN_QT_CHECK(AC_CHECK_LIB([${QT_LIB_PREFIX}PlatformSupport],[main],,BITCOIN_QT_FAIL(lib${QT_LIB_PREFIX}PlatformSupport not found)))
+         fi
        fi
      fi
   else

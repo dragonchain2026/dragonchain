@@ -117,7 +117,7 @@ bool static IsCompressedPubKey(const valtype &vchPubKey) {
 bool static IsValidSignatureEncoding(const std::vector<unsigned char> &sig) {
     // Falcon-512 signature format: variable length up to 690 bytes signature + 1 byte sighash
     // Falcon-512 signatures start with 0x39 (0x30 + 9)
-    if (sig.size() >= 1 && sig.size() <= 691) {
+    if (sig.size() >= 1 && sig.size() <= 691 && sig[0] == 0x39) {
         return true;
     }
 
@@ -187,7 +187,7 @@ bool static IsValidSignatureEncoding(const std::vector<unsigned char> &sig) {
 
 bool static IsLowDERSignature(const valtype &vchSig, ScriptError* serror) {
     // Falcon-512 signature: skip LowS check (doesn't apply to post-quantum signatures)
-    if (vchSig.size() >= 1 && vchSig.size() <= 691) {
+    if (vchSig.size() >= 1 && vchSig.size() <= 691 && vchSig[0] == 0x39) {
         return set_success(serror);
     }
 
@@ -225,8 +225,10 @@ bool CheckSignatureEncoding(const std::vector<unsigned char> &vchSig, unsigned i
         return true;
     }
     // Falcon-512 signature: skip DER encoding checks (doesn't apply to post-quantum signatures)
-    // Falcon-512 signatures can start with any byte and have variable length up to 691 bytes (with sighash)
-    if (vchSig.size() >= 1 && vchSig.size() <= 691) {
+    // Falcon-512 signatures start with 0x39 (0x30 + logn=9) and have variable
+    // length up to 691 bytes (with sighash). The header byte matches the check
+    // in PQCLEAN_FALCON512_CLEAN_crypto_sign_verify.
+    if (vchSig.size() >= 1 && vchSig.size() <= 691 && vchSig[0] == 0x39) {
         // Still check for valid hashtype if strict encoding is required
         if ((flags & SCRIPT_VERIFY_STRICTENC) != 0 && !IsDefinedHashtypeSignature(vchSig)) {
             return set_error(serror, SCRIPT_ERR_SIG_HASHTYPE);

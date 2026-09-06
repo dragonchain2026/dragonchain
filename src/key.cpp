@@ -294,6 +294,10 @@ bool CKey::SignCompact(const uint256 &hash, std::vector<unsigned char>& vchSig) 
 }
 
 bool CKey::Load(const CPrivKey &privkey, const CPubKey &vchPubKey, bool fSkipCheck=false) {
+    if (privkey.size() != PRIVATE_KEY_SIZE) {
+        fValid = false;
+        return false;
+    }
     memcpy((unsigned char*)begin(), privkey.data(), privkey.size());
     fCompressed = true; //vchPubKey.IsCompressed();
     fValid = true;
@@ -302,7 +306,8 @@ bool CKey::Load(const CPrivKey &privkey, const CPubKey &vchPubKey, bool fSkipChe
     if (fSkipCheck)
         return true;
 
-    return VerifyPubKey(vchPubKey);
+    fValid = VerifyPubKey(vchPubKey);
+    return fValid;
 }
 
 bool CKey::Derive(CKey& keyChild, ChainCode &ccChild, unsigned int nChild, const ChainCode& cc) const {

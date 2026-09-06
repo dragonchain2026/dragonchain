@@ -217,8 +217,8 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nTimeout = Consensus::BIP9Deployment::NO_TIMEOUT;
 
         // The best chain should have at least this much work.
-        // block 1482323 (2026-08-06)
-        consensus.nMinimumChainWork = uint256S("000000000000000000000000000000000000000000000000000000007f468ed2");
+        // block 1900000 (2026-09-02)
+        consensus.nMinimumChainWork = uint256S("00000000000000000000000000000000000000000000000000000000a90476bd");
 
         // By default assume that the signatures in ancestors of this block are valid.
         // TODO.SUGAR.UPDATE
@@ -293,6 +293,8 @@ public:
         checkpointData = {
             {
                 {0, uint256S("3c9761d390215d5e51843db7802845052ad8bdfad2014050b9cc6b82337089c2")},
+                // 防恶意分叉：拒绝高度 1900000 之前的任何分叉链（2026-09-02 添加）
+                {1900000, uint256S("4e831397a3181057c771257acb2cbe2e84b059684a11a5433a54568ca2a7cb86")},
             }
         };
 

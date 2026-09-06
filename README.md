@@ -1,25 +1,11 @@
 Dragonchain
 ===========
 
-**Version**: v0.6.0
+**Version**: v0.6.1
 **Genesis**: 2026-05-04 (Block Hash: `3c9761d390215d5e51843db7802845052ad8bdfad2014050b9cc6b82337089c2`)
 **Based on**: Sugarchain Yumekawa v0.16.3 (Bitcoin Core fork)
 
 Dragonchain is a post-quantum secure blockchain that integrates **Falcon-512** lattice-based signatures, replacing the original secp256k1 ECDSA. All wallet operations and transaction signing use Falcon-512 post-quantum cryptography.
-
-
-Downloads
----------
-
-Pre-built binaries for Linux, macOS and Windows are available on the [Releases](https://github.com/dragonchain2026/dragonchain/releases) page.
-
-| Platform | Binary |
-|----------|--------|
-| Linux x86_64 | [dragonchain-linux-x86_64.tar.gz](https://github.com/dragonchain2026/dragonchain/releases/latest/download/dragonchain-linux-x86_64.tar.gz) |
-| macOS arm64 | [dragonchain-macos-arm64.tar.gz](https://github.com/dragonchain2026/dragonchain/releases/latest/download/dragonchain-macos-arm64.tar.gz) |
-| Windows x86_64 | [dragonchain-windows-x86_64.tar.gz](https://github.com/dragonchain2026/dragonchain/releases/latest/download/dragonchain-windows-x86_64.tar.gz) |
-
-Each archive contains `dragonchaind` (daemon), `dragonchain-cli` (CLI), `dragonchain-tx` and `dragonchain-qt` (GUI wallet).
 
 
 Key Changes from Sugarchain
@@ -56,7 +42,7 @@ Defined in `src/key.h`:
 - **Wallet password bug**: Hardcoded 32-byte key size check in `crypter.cpp` `DecryptKey()` prevented encrypted wallet unlock (commit `bf3fccd`)
 - **Private key import/export**: `base58.cpp` `CBitcoinSecret::GetKey()` / `IsValid()` truncated Falcon-512 keys to 32 bytes
 - **BIP32 HD derivation**: `CKey::Derive()` `assert(size()==32)` replaced with graceful failure for Falcon-512
-- See `/home/zhonghuasheng/202605041/2/技术文档新/` for full technical documentation
+- See the project documentation for full technical details
 
 
 Original Sugarchain Yumekawa
@@ -76,7 +62,7 @@ information or see https://opensource.org/licenses/MIT.
 - Copyright (c) 2009-2018 The Bitcoin Core developers
 - Copyright (c) 2013-2019 Alexander Peslyak - Yespower 1.0.1
 - Copyright (c) 2016-2018 The Zcash developers - DigiShieldZEC
-- Copyright (c) 2021-2026 The tidecoin developers
+- Copyright (c) 2018-2020 The Dragonchain developers
 - Copyright (c) 2026 The Dragonchain developers
 
 
