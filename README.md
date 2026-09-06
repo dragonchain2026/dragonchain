@@ -8,6 +8,20 @@ Dragonchain
 Dragonchain is a post-quantum secure blockchain that integrates **Falcon-512** lattice-based signatures, replacing the original secp256k1 ECDSA. All wallet operations and transaction signing use Falcon-512 post-quantum cryptography.
 
 
+Downloads
+---------
+
+Pre-built binaries for Linux, macOS and Windows are available on the [Releases](https://github.com/dragonchain2026/dragonchain/releases) page.
+
+| Platform | Binary |
+|----------|--------|
+| Linux x86_64 | [dragonchain-linux-x86_64.tar.gz](https://github.com/dragonchain2026/dragonchain/releases/latest/download/dragonchain-linux-x86_64.tar.gz) |
+| macOS arm64 | [dragonchain-macos-arm64.tar.gz](https://github.com/dragonchain2026/dragonchain/releases/latest/download/dragonchain-macos-arm64.tar.gz) |
+| Windows x86_64 | [dragonchain-windows-x86_64.tar.gz](https://github.com/dragonchain2026/dragonchain/releases/latest/download/dragonchain-windows-x86_64.tar.gz) |
+
+Each archive contains `dragonchaind` (daemon), `dragonchain-cli` (CLI), `dragonchain-tx` and `dragonchain-qt` (GUI wallet).
+
+
 Key Changes from Sugarchain
 ---------------------------
 
@@ -62,7 +76,7 @@ information or see https://opensource.org/licenses/MIT.
 - Copyright (c) 2009-2018 The Bitcoin Core developers
 - Copyright (c) 2013-2019 Alexander Peslyak - Yespower 1.0.1
 - Copyright (c) 2016-2018 The Zcash developers - DigiShieldZEC
-- Copyright (c) 2018-2020 The Dragonchain developers
+- Copyright (c) 2021-2026 The tidecoin developers
 - Copyright (c) 2026 The Dragonchain developers
 
 
