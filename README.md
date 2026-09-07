@@ -72,12 +72,13 @@ License
 -------
 Dragonchain is released under the terms of the MIT license. See [COPYING](COPYING) for more
 information or see https://opensource.org/licenses/MIT.
-- Copyright (c) 2009-2010 Satoshi Nakamoto
-- Copyright (c) 2009-2018 The Bitcoin Core developers
-- Copyright (c) 2013-2019 Alexander Peslyak - Yespower 1.0.1
-- Copyright (c) 2016-2026 The Zcash developers - DigiShieldZEC
-- Copyright (c) 2021-2026 The tidecoin developers
-- Copyright (c) 2026 The Dragonchain developers
+- Copyright (C) 2009-2010 Satoshi Nakamoto
+- Copyright (C) 2009-2026 The Bitcoin Core developers
+- Copyright (C) 2013-2019 Alexander Peslyak - Yespower 1.0.1
+- Copyright (C) 2016-2026 The Zcash developers - DigiShieldZEC
+- Copyright (C) 2018-2019 sugarchain
+- Copyright (C) 2021-2026 tidecoin chain
+- Copyright (C) 2026 The Dragonchain developers
 
 
 Minimum Requirement

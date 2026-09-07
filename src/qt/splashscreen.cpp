@@ -55,11 +55,11 @@ SplashScreen::SplashScreen(Qt::WindowFlags f, const NetworkStyle *networkStyle) 
     // BEGIN - Adding Additional CopyrightHolders (2/2)
     // Duplicated <init.cpp> but little bit different
     const std::string Copyright_1 = strprintf(_("\xc2\xA9 %u-%u "), 2009, 2010) + "Satoshi Nakamoto";
-    const std::string Copyright_2 = strprintf(_("\xc2\xA9 %u-%u "), 2009, 2018) + "The Bitcoin Core developers";
+    const std::string Copyright_2 = strprintf(_("\xc2\xA9 %u-%u "), 2009, 2026) + "The Bitcoin Core developers";
     const std::string Copyright_3 = strprintf(_("\xc2\xA9 %u-%u "), 2013, 2019) + "Alexander Peslyak - Yespower 1.0.1";
-    const std::string Copyright_4 = strprintf(_("\xc2\xA9 %u-%u "), 2016, 2018) + "The Zcash developers - DigiShieldZEC";
+    const std::string Copyright_4 = strprintf(_("\xc2\xA9 %u-%u "), 2016, 2026) + "The Zcash developers - DigiShieldZEC";
     const std::string Copyright_5 = strprintf(_("\xc2\xA9 %u-%u "), 2018, 2019) + "sugarchain";
-    const std::string Copyright_6 = strprintf(_("\xc2\xA9 %u"), 2021) + " tidecoin chain";
+    const std::string Copyright_6 = strprintf(_("\xc2\xA9 %u-%u "), 2021, 2026) + " tidecoin chain";
     // END - Adding Additional CopyrightHolders (2/2)
 
     // BEGIN - Placing Additional CopyrightHolders
