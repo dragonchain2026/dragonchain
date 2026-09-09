@@ -19,7 +19,7 @@ Please report security vulnerabilities privately through one of these channels:
 
 - **GitHub Security Advisory** (preferred): use the "Report a vulnerability" flow
   on the repository's Security tab.
-- **Email**: `security@dragonchain.cc`
+- **Email**: `dragonchainsupport@proton.me`
 
 ### Guidelines
 
