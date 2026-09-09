@@ -22,6 +22,30 @@ Pre-built binaries for Linux, macOS and Windows are available on the [Releases](
 Each archive contains `dragonchaind` (daemon), `dragonchain-cli` (CLI), `dragonchain-tx` and `dragonchain-qt` (GUI wallet).
 
 
+Windows: "missing DLL" error
+----------------------------
+
+The Windows binaries are built with MinGW-w64 and are distributed together with
+these three runtime DLLs (bundled inside `dragonchain-windows-x86_64.tar.gz`):
+
+- `libgcc_s_seh-1.dll`
+- `libstdc++-6.dll`
+- `libwinpthread-1.dll`
+
+Extract the **entire** archive and run `dragonchain-qt.exe` from the same folder
+it was extracted to. Do **not** move only the `.exe` to another location, and do
+**not** download these DLLs from third-party "DLL download" sites — a mismatched
+ABI/version will crash the wallet, and such sites frequently bundle malware.
+
+If you still get a missing-DLL error, you are likely running an older release or
+an incomplete extraction. Download the latest archive from
+[Releases](https://github.com/dragonchain2026/dragonchain/releases) and extract
+all files into a single folder.
+
+The source code and licenses of all third-party dependencies are listed in
+[THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+
+
 Key Changes from Sugarchain
 ---------------------------
 
