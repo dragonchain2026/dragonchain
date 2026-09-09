@@ -1,7 +1,7 @@
 Dragonchain
 ===========
 
-**Version**: v0.6.1
+**Version**: v0.6.2
 **Genesis**: 2026-05-04 (Block Hash: `3c9761d390215d5e51843db7802845052ad8bdfad2014050b9cc6b82337089c2`)
 **Based on**: Sugarchain Yumekawa v0.16.3 (Bitcoin Core fork)
 
