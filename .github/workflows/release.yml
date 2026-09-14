@@ -16,6 +16,7 @@ on:
           - linux
           - windows
           - macos
+          - macos-intel
       tag:
         description: 'Release tag name (e.g. v0.6.2) — required for manual dispatch'
         required: false
@@ -159,9 +160,55 @@ jobs:
             src/qt/dragonchain-qt
           retention-days: 30
 
+  build-macos-intel:
+    name: macOS (x86_64 Intel)
+    if: github.event_name == 'push' || github.event.inputs.platform == 'all' || github.event.inputs.platform == 'macos-intel'
+    runs-on: macos-15-intel
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: |
+          brew install automake libtool boost miniupnpc openssl pkg-config libevent berkeley-db@5 qt@5 protobuf@21
+
+      - name: Build
+        run: |
+          ./autogen.sh
+          export BDB_CFLAGS="-I$(brew --prefix berkeley-db@5)/include"
+          export BDB_LIBS="-L$(brew --prefix berkeley-db@5)/lib -ldb_cxx-5.3"
+          export BOOST_ROOT="$(brew --prefix boost)"
+          export QT5_PREFIX="$(brew --prefix qt@5)"
+          export PROTOBUF_PREFIX="$(brew --prefix protobuf@21)"
+          export PKG_CONFIG_PATH="$QT5_PREFIX/lib/pkgconfig:$PROTOBUF_PREFIX/lib/pkgconfig:$PKG_CONFIG_PATH"
+          # boost >= 1.69 makes boost_system header-only (no libboost_system file),
+          # but the old AX_BOOST_SYSTEM macro still searches for the library.
+          # Create an empty archive so the check passes (header-only needs no link).
+          if [ ! -f "$BOOST_ROOT/lib/libboost_system.a" ]; then
+            echo '' | cc -x c -c -o /tmp/empty.o -
+            ar rcs "$BOOST_ROOT/lib/libboost_system.a" /tmp/empty.o
+          fi
+          ./configure --with-gui=qt5 --with-incompatible-bdb --disable-zmq --disable-tests \
+            --with-boost="$BOOST_ROOT" \
+            CPPFLAGS="$BDB_CFLAGS" LDFLAGS="$BDB_LIBS"
+          make -j$(sysctl -n hw.ncpu)
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dragonchain-macos-x86_64
+          path: |
+            src/dragonchaind
+            src/dragonchain-cli
+            src/dragonchain-tx
+            src/qt/dragonchain-qt
+          retention-days: 30
+
   release:
     name: Create Release
-    needs: [build-linux, build-windows, build-macos]
+    needs: [build-linux, build-windows, build-macos, build-macos-intel]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -171,7 +218,8 @@ jobs:
       (startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch') &&
       (needs.build-windows.result == 'success' || needs.build-windows.result == 'skipped') &&
       (needs.build-linux.result == 'success' || needs.build-linux.result == 'skipped') &&
-      (needs.build-macos.result == 'success' || needs.build-macos.result == 'skipped')
+      (needs.build-macos.result == 'success' || needs.build-macos.result == 'skipped') &&
+      (needs.build-macos-intel.result == 'success' || needs.build-macos-intel.result == 'skipped')
     steps:
       - name: Determine release tag
         id: tag
