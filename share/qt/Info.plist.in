@@ -29,16 +29,16 @@
   <string>????</string>
 
   <key>CFBundleExecutable</key>
-  <string>Sugarchain-Qt</string>
+  <string>Dragonchain-Qt</string>
   
   <key>CFBundleName</key>
-  <string>Sugarchain-Qt</string>
+  <string>Dragonchain-Qt</string>
 
   <key>LSHasLocalizedDisplayName</key>
   <true/>
 
   <key>CFBundleIdentifier</key>
-  <string>org.sugarchainfoundation.Sugarchain-Qt</string>
+  <string>cc.dragonchain.wallet</string>
 
   <key>CFBundleURLTypes</key>
   <array>
@@ -46,10 +46,10 @@
       <key>CFBundleTypeRole</key>
       <string>Editor</string>
       <key>CFBundleURLName</key>
-      <string>org.sugarchain.SugarchainPayment</string>
+      <string>cc.dragonchain.wallet.Payment</string>
       <key>CFBundleURLSchemes</key>
       <array>
-        <string>sugarchain</string>
+        <string>dragonchain</string>
       </array>
     </dict>
   </array>
@@ -58,9 +58,9 @@
   <array>
     <dict>
       <key>UTTypeIdentifier</key>
-      <string>org.sugarchain.paymentrequest</string>
+      <string>cc.dragonchain.wallet.paymentrequest</string>
       <key>UTTypeDescription</key>
-      <string>Sugarchain payment request</string>
+      <string>Dragonchain payment request</string>
       <key>UTTypeConformsTo</key>
       <array>
         <string>public.data</string>
@@ -68,10 +68,10 @@
       <key>UTTypeTagSpecification</key>
       <dict>
         <key>public.mime-type</key>
-        <string>application/x-sugarchain-payment-request</string>
+        <string>application/x-dragonchain-payment-request</string>
         <key>public.filename-extension</key>
         <array>
-          <string>sugarchainpaymentrequest</string>
+          <string>dragonchainpaymentrequest</string>
         </array>
       </dict>
     </dict>
@@ -84,7 +84,7 @@
       <string>Editor</string>
       <key>LSItemContentTypes</key>
       <array>
-        <string>org.sugarchain.paymentrequest</string>
+        <string>cc.dragonchain.wallet.paymentrequest</string>
       </array>
       <key>LSHandlerRank</key>
       <string>Owner</string>

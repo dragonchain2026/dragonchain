@@ -149,15 +149,43 @@ jobs:
             CPPFLAGS="$BDB_CFLAGS" LDFLAGS="$BDB_LIBS"
           make -j$(sysctl -n hw.ncpu)
 
+      - name: Package macOS .app + dmg
+        run: |
+          export QT5_PREFIX="$(brew --prefix qt@5)"
+          export QTDIR="$QT5_PREFIX"
+          # Assemble .app skeleton (Contents/MacOS/Dragonchain-Qt + Info.plist + icon)
+          make appbundle
+          # Inject Qt frameworks + plugins and rewrite install names to @executable_path.
+          # Produces dist/Dragonchain-Qt.app (self-contained, no Homebrew needed at runtime).
+          python3 contrib/macdeploy/macdeployqtplus Dragonchain-Qt.app -verbose 2
+          # Add CLI daemons + Applications symlink + README into dist/
+          cp src/dragonchaind src/dragonchain-cli src/dragonchain-tx dist/
+          ln -sf /Applications dist/Applications
+          printf '%s\n' \
+            'Dragonchain macOS wallet (ad-hoc signed, un-notarized)' \
+            '' \
+            'First launch: right-click Dragonchain-Qt.app -> Open (Gatekeeper)' \
+            'CLI: dragonchaind / dragonchain-cli / dragonchain-tx' \
+            > dist/README-macOS.txt
+          # Ad-hoc sign everything
+          codesign --force --deep --sign - dist/Dragonchain-Qt.app
+          for b in dragonchaind dragonchain-cli dragonchain-tx; do
+            codesign --force --sign - "dist/$b"
+          done
+          codesign --verify --deep --verbose=2 dist/Dragonchain-Qt.app 2>&1 | tail -8 || true
+          # Build dmg + zip (self-contained 4-piece bundle)
+          hdiutil create -volname "Dragonchain" -srcfolder dist -ov -format UDZO \
+            "dragonchain-macos-$(uname -m).dmg"
+          ditto -c -k --keepParent dist "dragonchain-macos-$(uname -m).zip"
+          ls -la
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: dragonchain-macos-arm64
           path: |
-            src/dragonchaind
-            src/dragonchain-cli
-            src/dragonchain-tx
-            src/qt/dragonchain-qt
+            dragonchain-macos-*.dmg
+            dragonchain-macos-*.zip
           retention-days: 30
 
   build-macos-intel:
@@ -195,15 +223,43 @@ jobs:
             CPPFLAGS="$BDB_CFLAGS" LDFLAGS="$BDB_LIBS"
           make -j$(sysctl -n hw.ncpu)
 
+      - name: Package macOS .app + dmg
+        run: |
+          export QT5_PREFIX="$(brew --prefix qt@5)"
+          export QTDIR="$QT5_PREFIX"
+          # Assemble .app skeleton (Contents/MacOS/Dragonchain-Qt + Info.plist + icon)
+          make appbundle
+          # Inject Qt frameworks + plugins and rewrite install names to @executable_path.
+          # Produces dist/Dragonchain-Qt.app (self-contained, no Homebrew needed at runtime).
+          python3 contrib/macdeploy/macdeployqtplus Dragonchain-Qt.app -verbose 2
+          # Add CLI daemons + Applications symlink + README into dist/
+          cp src/dragonchaind src/dragonchain-cli src/dragonchain-tx dist/
+          ln -sf /Applications dist/Applications
+          printf '%s\n' \
+            'Dragonchain macOS wallet (ad-hoc signed, un-notarized)' \
+            '' \
+            'First launch: right-click Dragonchain-Qt.app -> Open (Gatekeeper)' \
+            'CLI: dragonchaind / dragonchain-cli / dragonchain-tx' \
+            > dist/README-macOS.txt
+          # Ad-hoc sign everything
+          codesign --force --deep --sign - dist/Dragonchain-Qt.app
+          for b in dragonchaind dragonchain-cli dragonchain-tx; do
+            codesign --force --sign - "dist/$b"
+          done
+          codesign --verify --deep --verbose=2 dist/Dragonchain-Qt.app 2>&1 | tail -8 || true
+          # Build dmg + zip (self-contained 4-piece bundle)
+          hdiutil create -volname "Dragonchain" -srcfolder dist -ov -format UDZO \
+            "dragonchain-macos-$(uname -m).dmg"
+          ditto -c -k --keepParent dist "dragonchain-macos-$(uname -m).zip"
+          ls -la
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: dragonchain-macos-x86_64
           path: |
-            src/dragonchaind
-            src/dragonchain-cli
-            src/dragonchain-tx
-            src/qt/dragonchain-qt
+            dragonchain-macos-*.dmg
+            dragonchain-macos-*.zip
           retention-days: 30
 
   release:
@@ -216,10 +272,10 @@ jobs:
       always() &&
       !cancelled() &&
       (startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch') &&
-      (needs.build-windows.result == 'success' || needs.build-windows.result == 'skipped') &&
-      (needs.build-linux.result == 'success' || needs.build-linux.result == 'skipped') &&
-      (needs.build-macos.result == 'success' || needs.build-macos.result == 'skipped') &&
-      (needs.build-macos-intel.result == 'success' || needs.build-macos-intel.result == 'skipped')
+      (needs.build-windows.result == 'success') &&
+      (needs.build-linux.result == 'success') &&
+      (needs.build-macos.result == 'success') &&
+      (needs.build-macos-intel.result == 'success')
     steps:
       - name: Determine release tag
         id: tag
@@ -244,14 +300,28 @@ jobs:
         run: |
           cd artifacts
           for d in */; do
-            tar -czf "${d%/}.tar.gz" "$d"
+            d="${d%/}"
+            case "$d" in
+              dragonchain-macos-*)
+                # macOS already packaged as .dmg/.zip inside — promote them verbatim
+                for f in "$d"/*.dmg "$d"/*.zip; do
+                  [ -e "$f" ] && mv "$f" .
+                done
+                ;;
+              *)
+                tar -czf "$d.tar.gz" "$d"
+                ;;
+            esac
           done
           ls -la
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          files: artifacts/*.tar.gz
+          files: |
+            artifacts/*.tar.gz
+            artifacts/*.dmg
+            artifacts/*.zip
           generate_release_notes: true
           tag_name: ${{ steps.tag.outputs.tag }}
         env:
