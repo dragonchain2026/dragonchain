@@ -153,6 +153,7 @@ jobs:
         run: |
           export QT5_PREFIX="$(brew --prefix qt@5)"
           export QTDIR="$QT5_PREFIX"
+          export HOMEBREW_PREFIX="$(brew --prefix)"
           # Assemble .app skeleton (Contents/MacOS/Dragonchain-Qt + Info.plist + icon)
           make appbundle
           # Inject Qt frameworks + plugins and rewrite install names to @executable_path.
@@ -227,6 +228,7 @@ jobs:
         run: |
           export QT5_PREFIX="$(brew --prefix qt@5)"
           export QTDIR="$QT5_PREFIX"
+          export HOMEBREW_PREFIX="$(brew --prefix)"
           # Assemble .app skeleton (Contents/MacOS/Dragonchain-Qt + Info.plist + icon)
           make appbundle
           # Inject Qt frameworks + plugins and rewrite install names to @executable_path.

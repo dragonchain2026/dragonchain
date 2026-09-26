@@ -219,6 +219,29 @@ def getRpaths(binaryPath):
     return rpaths
 
 
+def _resolveViaBrewPrefix(rest):
+    """Fall back to locating a Homebrew-installed dylib/framework by name. Some Qt
+    plugins reference non-Qt deps via @rpath without carrying an LC_RPATH for them
+    (e.g. libqwebp -> @rpath/libwebp.7.dylib), so LC_RPATH lookup alone fails."""
+    prefix = os.getenv("HOMEBREW_PREFIX")
+    if not prefix:
+        prefix = os.getenv("QTDIR")
+        if prefix:
+            prefix = os.path.dirname(os.path.dirname(prefix))
+    if not prefix:
+        return None
+    import glob
+    base = os.path.basename(rest)
+    for pattern in (os.path.join(prefix, "opt", "*", "lib", base),
+                    os.path.join(prefix, "opt", "*", "lib", rest),
+                    os.path.join(prefix, "lib", base),
+                    os.path.join(prefix, "Cellar", "*", "*", "lib", base)):
+        for cand in glob.glob(pattern):
+            if os.path.exists(cand):
+                return cand
+    return None
+
+
 def resolveRpathInLine(line, binaryPath):
     """Resolve an @rpath/ install name to an absolute path for copying, while
     preserving the original name so install_name_tool -change still matches the
@@ -231,6 +254,9 @@ def resolveRpathInLine(line, binaryPath):
         cand = os.path.join(rp, rest)
         if os.path.exists(cand):
             return cand, stripped
+    cand = _resolveViaBrewPrefix(rest)
+    if cand is not None:
+        return cand, stripped
     return stripped, stripped
 
 
