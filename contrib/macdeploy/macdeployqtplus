@@ -247,16 +247,20 @@ def resolveRpathInLine(line, binaryPath):
     preserving the original name so install_name_tool -change still matches the
     binary's actual reference."""
     stripped = line.strip()
-    if not stripped.startswith("@rpath/"):
+    # otool -L dependency lines carry a "(compatibility version X, current version Y)"
+    # suffix. Split it off to get the bare install name, otherwise the suffix would
+    # be folded into the filesystem path we search for.
+    name = stripped.split(" (compatibility version", 1)[0]
+    if not name.startswith("@rpath/"):
         return stripped, None
-    rest = stripped[len("@rpath/"):]
+    rest = name[len("@rpath/"):]
     for rp in getRpaths(binaryPath):
         cand = os.path.join(rp, rest)
         if os.path.exists(cand):
-            return cand, stripped
+            return stripped.replace(name, cand, 1), name
     cand = _resolveViaBrewPrefix(rest)
     if cand is not None:
-        return cand, stripped
+        return stripped.replace(name, cand, 1), name
     return stripped, stripped
 
 
