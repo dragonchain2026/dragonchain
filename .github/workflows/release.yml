@@ -168,6 +168,15 @@ jobs:
             'First launch: right-click Dragonchain-Qt.app -> Open (Gatekeeper)' \
             'CLI: dragonchaind / dragonchain-cli / dragonchain-tx' \
             > dist/README-macOS.txt
+          # Fix up Qt framework bundles: macdeployqtplus copies the binary into
+          # Versions/<ver>/<Name> and creates Versions/Current, but omits the
+          # top-level <Name> -> Versions/Current/<Name> symlink codesign needs to
+          # recognise the framework as a valid bundle ("bundle format unrecognized").
+          for fw in dist/Dragonchain-Qt.app/Contents/Frameworks/*.framework; do
+            [ -d "$fw" ] || continue
+            name="$(basename "$fw" .framework)"
+            [ -e "$fw/$name" ] || ln -s "Versions/Current/$name" "$fw/$name"
+          done
           # Ad-hoc sign everything
           codesign --force --deep --sign - dist/Dragonchain-Qt.app
           for b in dragonchaind dragonchain-cli dragonchain-tx; do
@@ -243,6 +252,15 @@ jobs:
             'First launch: right-click Dragonchain-Qt.app -> Open (Gatekeeper)' \
             'CLI: dragonchaind / dragonchain-cli / dragonchain-tx' \
             > dist/README-macOS.txt
+          # Fix up Qt framework bundles: macdeployqtplus copies the binary into
+          # Versions/<ver>/<Name> and creates Versions/Current, but omits the
+          # top-level <Name> -> Versions/Current/<Name> symlink codesign needs to
+          # recognise the framework as a valid bundle ("bundle format unrecognized").
+          for fw in dist/Dragonchain-Qt.app/Contents/Frameworks/*.framework; do
+            [ -d "$fw" ] || continue
+            name="$(basename "$fw" .framework)"
+            [ -e "$fw/$name" ] || ln -s "Versions/Current/$name" "$fw/$name"
+          done
           # Ad-hoc sign everything
           codesign --force --deep --sign - dist/Dragonchain-Qt.app
           for b in dragonchaind dragonchain-cli dragonchain-tx; do
