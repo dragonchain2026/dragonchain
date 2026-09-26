@@ -199,6 +199,41 @@ class DeploymentInfo(object):
                     return True
         return False
 
+def getRpaths(binaryPath):
+    """Return the binary's LC_RPATH entries, resolving @loader_path/@executable_path."""
+    rpaths = []
+    otoolbin = os.getenv("OTOOL", "otool")
+    try:
+        p = subprocess.Popen([otoolbin, "-l", binaryPath], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        out, _ = p.communicate()
+        if p.returncode != 0:
+            return rpaths
+        text = out.decode()
+        for m in re.finditer(r'path\s+(\S+)\s+\(offset\s+\d+\)', text):
+            rp = m.group(1)
+            rp = rp.replace("@loader_path", os.path.dirname(binaryPath))
+            rp = rp.replace("@executable_path", os.path.dirname(binaryPath))
+            rpaths.append(rp)
+    except Exception:
+        pass
+    return rpaths
+
+
+def resolveRpathInLine(line, binaryPath):
+    """Resolve an @rpath/ install name to an absolute path for copying, while
+    preserving the original name so install_name_tool -change still matches the
+    binary's actual reference."""
+    stripped = line.strip()
+    if not stripped.startswith("@rpath/"):
+        return stripped, None
+    rest = stripped[len("@rpath/"):]
+    for rp in getRpaths(binaryPath):
+        cand = os.path.join(rp, rest)
+        if os.path.exists(cand):
+            return cand, stripped
+    return stripped, stripped
+
+
 def getFrameworks(binaryPath, verbose):
     if verbose >= 3:
         print("Inspecting with otool: " + binaryPath)
@@ -219,8 +254,11 @@ def getFrameworks(binaryPath, verbose):
     libraries = []
     for line in otoolLines:
         line = line.replace("@loader_path", os.path.dirname(binaryPath))
-        info = FrameworkInfo.fromOtoolLibraryLine(line.strip())
+        resolved, orig = resolveRpathInLine(line, binaryPath)
+        info = FrameworkInfo.fromOtoolLibraryLine(resolved)
         if info is not None:
+            if orig is not None:
+                info.installName = orig
             if verbose >= 3:
                 print("Found framework:")
                 print(info)
