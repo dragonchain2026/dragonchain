@@ -168,15 +168,26 @@ jobs:
             'First launch: right-click Dragonchain-Qt.app -> Open (Gatekeeper)' \
             'CLI: dragonchaind / dragonchain-cli / dragonchain-tx' \
             > dist/README-macOS.txt
-          # Fix up Qt framework bundles: macdeployqtplus copies the binary into
-          # Versions/<ver>/<Name> and creates Versions/Current, but omits the
-          # top-level <Name> -> Versions/Current/<Name> symlink codesign needs to
-          # recognise the framework as a valid bundle ("bundle format unrecognized").
+          # Reconstruct the proper Apple framework layout. macdeployqtplus copies the
+          # framework binary to Versions/<ver>/<Name> and drops Resources at the top
+          # level, omitting the top-level symlinks. codesign then reports "bundle
+          # format unrecognized, invalid, or unsuitable" because it cannot locate the
+          # framework executable or Info.plist. Restore:
+          #   <Name>    -> Versions/Current/<Name>
+          #   Resources -> Versions/Current/Resources
+          #   Versions/<ver>/Resources/Info.plist
           for fw in dist/Dragonchain-Qt.app/Contents/Frameworks/*.framework; do
             [ -d "$fw" ] || continue
             name="$(basename "$fw" .framework)"
+            ver="$(readlink "$fw/Versions/Current" 2>/dev/null || echo 5)"
+            if [ -d "$fw/Resources" ] && [ ! -e "$fw/Versions/$ver/Resources" ]; then
+              mv "$fw/Resources" "$fw/Versions/$ver/Resources"
+            fi
+            [ -e "$fw/Resources" ] || ln -s "Versions/Current/Resources" "$fw/Resources"
             [ -e "$fw/$name" ] || ln -s "Versions/Current/$name" "$fw/$name"
           done
+          echo "=== Qt3DInput.framework tree ==="
+          find dist/Dragonchain-Qt.app/Contents/Frameworks/Qt3DInput.framework -maxdepth 3 | sort
           # Ad-hoc sign everything
           codesign --force --deep --sign - dist/Dragonchain-Qt.app
           for b in dragonchaind dragonchain-cli dragonchain-tx; do
@@ -252,15 +263,26 @@ jobs:
             'First launch: right-click Dragonchain-Qt.app -> Open (Gatekeeper)' \
             'CLI: dragonchaind / dragonchain-cli / dragonchain-tx' \
             > dist/README-macOS.txt
-          # Fix up Qt framework bundles: macdeployqtplus copies the binary into
-          # Versions/<ver>/<Name> and creates Versions/Current, but omits the
-          # top-level <Name> -> Versions/Current/<Name> symlink codesign needs to
-          # recognise the framework as a valid bundle ("bundle format unrecognized").
+          # Reconstruct the proper Apple framework layout. macdeployqtplus copies the
+          # framework binary to Versions/<ver>/<Name> and drops Resources at the top
+          # level, omitting the top-level symlinks. codesign then reports "bundle
+          # format unrecognized, invalid, or unsuitable" because it cannot locate the
+          # framework executable or Info.plist. Restore:
+          #   <Name>    -> Versions/Current/<Name>
+          #   Resources -> Versions/Current/Resources
+          #   Versions/<ver>/Resources/Info.plist
           for fw in dist/Dragonchain-Qt.app/Contents/Frameworks/*.framework; do
             [ -d "$fw" ] || continue
             name="$(basename "$fw" .framework)"
+            ver="$(readlink "$fw/Versions/Current" 2>/dev/null || echo 5)"
+            if [ -d "$fw/Resources" ] && [ ! -e "$fw/Versions/$ver/Resources" ]; then
+              mv "$fw/Resources" "$fw/Versions/$ver/Resources"
+            fi
+            [ -e "$fw/Resources" ] || ln -s "Versions/Current/Resources" "$fw/Resources"
             [ -e "$fw/$name" ] || ln -s "Versions/Current/$name" "$fw/$name"
           done
+          echo "=== Qt3DInput.framework tree ==="
+          find dist/Dragonchain-Qt.app/Contents/Frameworks/Qt3DInput.framework -maxdepth 3 | sort
           # Ad-hoc sign everything
           codesign --force --deep --sign - dist/Dragonchain-Qt.app
           for b in dragonchaind dragonchain-cli dragonchain-tx; do
