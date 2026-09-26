@@ -15,12 +15,14 @@ Pre-built binaries for Linux, macOS and Windows are available on the [Releases](
 
 | Platform | Binary |
 |----------|--------|
-| Linux x86_64 | [dragonchain-linux-x86_64.tar.gz](https://github.com/dragonchain2026/dragonchain/releases/download/v0.6.1/dragonchain-linux-x86_64.tar.gz) |
-| macOS arm64 | [dragonchain-macos-arm64.tar.gz](https://github.com/dragonchain2026/dragonchain/releases/download/v0.6.1/dragonchain-macos-arm64.tar.gz) |
-| macOS x86_64 (Intel) | [dragonchain-macos-x86_64.tar.gz](https://github.com/dragonchain2026/dragonchain/releases/download/v0.6.2/dragonchain-macos-x86_64.tar.gz) |
-| Windows x86_64 | [dragonchain-windows-x86_64.tar.gz](https://github.com/dragonchain2026/dragonchain/releases/download/v0.6.2/dragonchain-windows-x86_64.tar.gz) |
+| Linux x86_64 | [dragonchain-linux-x86_64.tar.gz](https://github.com/dragonchain2026/dragonchain/releases/download/v0.6.3/dragonchain-linux-x86_64.tar.gz) |
+| macOS arm64 | [dragonchain-macos-arm64.dmg](https://github.com/dragonchain2026/dragonchain/releases/download/v0.6.3/dragonchain-macos-arm64.dmg) |
+| macOS x86_64 (Intel) | [dragonchain-macos-x86_64.dmg](https://github.com/dragonchain2026/dragonchain/releases/download/v0.6.3/dragonchain-macos-x86_64.dmg) |
+| Windows x86_64 | [dragonchain-windows-x86_64.tar.gz](https://github.com/dragonchain2026/dragonchain/releases/download/v0.6.3/dragonchain-windows-x86_64.tar.gz) |
 
-Each archive contains `dragonchaind` (daemon), `dragonchain-cli` (CLI), `dragonchain-tx` and `dragonchain-qt` (GUI wallet).
+The Linux and Windows archives contain `dragonchaind` (daemon), `dragonchain-cli` (CLI), `dragonchain-tx` and `dragonchain-qt` (GUI wallet).
+
+The macOS `.dmg` contains a self-contained `Dragonchain-Qt.app` (drag it to `Applications`) plus the three CLI binaries; a `.zip` is provided for manual extraction. The app is ad-hoc signed and not notarized — on first launch right-click `Dragonchain-Qt.app` → **Open** to bypass Gatekeeper.
 
 
 Windows: "missing DLL" error
