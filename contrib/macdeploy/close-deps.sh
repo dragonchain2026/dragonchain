@@ -44,15 +44,19 @@ candidates() {
 # de-duplicated by basename. System libraries (/usr/lib, /System/Library) are
 # always present on macOS and are skipped.
 collect_unresolved() {
-  local f dep c found
+  local f dep c found idline
   find "$APP/Contents/MacOS" "$APP/Contents/Frameworks" "$APP/Contents/PlugIns" \
        -type f 2>/dev/null | while read -r f; do
     file "$f" 2>/dev/null | grep -q 'Mach-O' || continue
+    # otool -L prints the shared library's own LC_ID_DYLIB (install name) first;
+    # that is an identity, not a load requirement, so fetch it and skip it.
+    idline="$(otool -D "$f" 2>/dev/null | tail -n +2 | head -1)"
     while read -r dep; do
       [ -z "$dep" ] && continue
       case "$dep" in
         /usr/lib/*|/System/Library/*) continue ;;   # OS-provided, always present
       esac
+      [ -n "$idline" ] && [ "$dep" = "$idline" ] && continue   # self ID, not a load
       found=""
       while read -r c; do
         [ -z "$c" ] && continue
