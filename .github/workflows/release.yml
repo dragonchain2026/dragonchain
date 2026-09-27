@@ -202,6 +202,12 @@ jobs:
           echo "=== Qt3DInput.framework tree ==="
           find dist/Dragonchain-Qt.app/Contents/Frameworks/Qt3DInput.framework -maxdepth 3 | sort
           # Ad-hoc sign everything (--deep also covers the CLIs now inside the .app)
+          # Recursively close the transitive dependency closure. macdeployqtplus
+          # misses boost sibling libs referenced via @loader_path, so the app
+          # ships without libboost_atomic/container/date_time and dyld aborts at
+          # launch. This copies them in and HARD-FAILS if anything is still missing.
+          chmod +x contrib/macdeploy/close-deps.sh
+          ./contrib/macdeploy/close-deps.sh dist/Dragonchain-Qt.app
           codesign --force --deep --sign - dist/Dragonchain-Qt.app
           codesign --verify --deep --verbose=2 dist/Dragonchain-Qt.app 2>&1 | tail -8 || true
           # Verify minimum OS version is 11.0 (must NOT be 14.0/15.0 from the CI SDK)
@@ -323,6 +329,12 @@ jobs:
           echo "=== Qt3DInput.framework tree ==="
           find dist/Dragonchain-Qt.app/Contents/Frameworks/Qt3DInput.framework -maxdepth 3 | sort
           # Ad-hoc sign everything (--deep also covers the CLIs now inside the .app)
+          # Recursively close the transitive dependency closure. macdeployqtplus
+          # misses boost sibling libs referenced via @loader_path, so the app
+          # ships without libboost_atomic/container/date_time and dyld aborts at
+          # launch. This copies them in and HARD-FAILS if anything is still missing.
+          chmod +x contrib/macdeploy/close-deps.sh
+          ./contrib/macdeploy/close-deps.sh dist/Dragonchain-Qt.app
           codesign --force --deep --sign - dist/Dragonchain-Qt.app
           codesign --verify --deep --verbose=2 dist/Dragonchain-Qt.app 2>&1 | tail -8 || true
           # Verify minimum OS version is 11.0 (must NOT be 14.0/15.0 from the CI SDK)
