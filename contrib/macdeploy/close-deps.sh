@@ -19,13 +19,12 @@ APP="${1:?usage: close-deps.sh <path/to/Dragonchain-Qt.app>}"
 FW="$APP/Contents/Frameworks"
 
 # ---- candidate locations a single load-command may resolve to ----
-# Prints absolute paths; prints nothing for system libraries (always present).
+# Prints absolute paths; prints nothing for libraries the caller already
+# classified as system-provided.
 candidates() {
   local bin="$1" dep="$2"
   local bindir; bindir="$(dirname "$bin")"
   case "$dep" in
-    /usr/lib/*|/System/Library/*)
-      return 0 ;;
     @executable_path/*)
       printf '%s\n' "$APP/Contents/MacOS/${dep#@executable_path/}" ;;
     @loader_path/*)
@@ -41,7 +40,9 @@ candidates() {
   esac
 }
 
-# Print "basename|dep|referrer" for every load-command that resolves to no file.
+# Print "basename|dep|referrer" for every load-command that resolves to no file,
+# de-duplicated by basename. System libraries (/usr/lib, /System/Library) are
+# always present on macOS and are skipped.
 collect_unresolved() {
   local f dep c found
   find "$APP/Contents/MacOS" "$APP/Contents/Frameworks" "$APP/Contents/PlugIns" \
@@ -49,6 +50,9 @@ collect_unresolved() {
     file "$f" 2>/dev/null | grep -q 'Mach-O' || continue
     while read -r dep; do
       [ -z "$dep" ] && continue
+      case "$dep" in
+        /usr/lib/*|/System/Library/*) continue ;;   # OS-provided, always present
+      esac
       found=""
       while read -r c; do
         [ -z "$c" ] && continue
@@ -56,7 +60,7 @@ collect_unresolved() {
       done < <(candidates "$f" "$dep")
       [ -z "$found" ] && printf '%s|%s|%s\n' "$(basename "$dep")" "$dep" "$f"
     done < <(otool -L "$f" 2>/dev/null | tail -n +2 | awk '{print $1}')
-  done
+  done | sort -u -t'|' -k1,1
 }
 
 echo "=== close-deps.sh: closing dependency closure for $APP ==="
@@ -66,6 +70,7 @@ while [ $round -lt 8 ]; do
   round=$((round + 1))
   needs="$(collect_unresolved)"
   [ -z "$needs" ] && { echo "依赖闭包在第 $((round-1)) 轮达成"; break; }
+  echo "第 $round 轮，需补齐 $(printf '%s\n' "$needs" | wc -l | tr -d ' ') 项"
 
   added=0
   while IFS='|' read -r base dep ref; do
