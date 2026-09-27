@@ -144,9 +144,13 @@ jobs:
             echo '' | cc -x c -c -o /tmp/empty.o -
             ar rcs "$BOOST_ROOT/lib/libboost_system.a" /tmp/empty.o
           fi
+          export MACOSX_DEPLOYMENT_TARGET=11.0
+          export CFLAGS="-O2 -mmacosx-version-min=11.0"
+          export CXXFLAGS="-O2 -mmacosx-version-min=11.0"
+          export LDFLAGS="-mmacosx-version-min=11.0 $BDB_LIBS"
           ./configure --with-gui=qt5 --with-incompatible-bdb --disable-zmq --disable-tests \
             --with-boost="$BOOST_ROOT" \
-            CPPFLAGS="$BDB_CFLAGS" LDFLAGS="$BDB_LIBS"
+            CPPFLAGS="$BDB_CFLAGS" CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" LDFLAGS="$LDFLAGS"
           make -j$(sysctl -n hw.ncpu)
 
       - name: Package macOS .app + dmg
@@ -159,8 +163,17 @@ jobs:
           # Inject Qt frameworks + plugins and rewrite install names to @executable_path.
           # Produces dist/Dragonchain-Qt.app (self-contained, no Homebrew needed at runtime).
           python3 contrib/macdeploy/macdeployqtplus Dragonchain-Qt.app -verbose 2
-          # Add CLI daemons + Applications symlink + README into dist/
-          cp src/dragonchaind src/dragonchain-cli src/dragonchain-tx dist/
+          # Add CLI daemons INTO the .app so @executable_path/../Frameworks resolves,
+          # then rewrite their Homebrew absolute-path deps to the bundled Frameworks.
+          for b in dragonchaind dragonchain-cli dragonchain-tx; do
+            cp "src/$b" "dist/Dragonchain-Qt.app/Contents/MacOS/$b"
+            B="dist/Dragonchain-Qt.app/Contents/MacOS/$b"
+            for dep in $(otool -L "$B" | tail -n +2 | awk '{print $1}' | grep -E '^/(opt/homebrew|usr/local/opt)' || true); do
+              install_name_tool -change "$dep" \
+                "@executable_path/../Frameworks/$(basename "$dep")" "$B"
+            done
+            ln -sf "Dragonchain-Qt.app/Contents/MacOS/$b" "dist/$b"
+          done
           ln -sf /Applications dist/Applications
           printf '%s\n' \
             'Dragonchain macOS wallet (ad-hoc signed, un-notarized)' \
@@ -188,12 +201,25 @@ jobs:
           done
           echo "=== Qt3DInput.framework tree ==="
           find dist/Dragonchain-Qt.app/Contents/Frameworks/Qt3DInput.framework -maxdepth 3 | sort
-          # Ad-hoc sign everything
+          # Ad-hoc sign everything (--deep also covers the CLIs now inside the .app)
           codesign --force --deep --sign - dist/Dragonchain-Qt.app
-          for b in dragonchaind dragonchain-cli dragonchain-tx; do
-            codesign --force --sign - "dist/$b"
-          done
           codesign --verify --deep --verbose=2 dist/Dragonchain-Qt.app 2>&1 | tail -8 || true
+          # Verify minimum OS version is 11.0 (must NOT be 14.0/15.0 from the CI SDK)
+          echo "=== minos check (expect 11.0) ==="
+          for f in dist/Dragonchain-Qt.app/Contents/MacOS/Dragonchain-Qt \
+                   dist/Dragonchain-Qt.app/Contents/MacOS/dragonchaind \
+                   dist/Dragonchain-Qt.app/Contents/MacOS/dragonchain-cli \
+                   dist/Dragonchain-Qt.app/Contents/MacOS/dragonchain-tx; do
+            [ -f "$f" ] && printf '%-28s ' "$(basename "$f")" && (otool -l "$f" | grep -A3 LC_BUILD_VERSION | grep minos || echo no-minos)
+          done
+          # Verify no Homebrew absolute paths remain in any shipped binary
+          echo "=== Homebrew absolute-path check (expect no output) ==="
+          for f in dist/Dragonchain-Qt.app/Contents/MacOS/Dragonchain-Qt \
+                   dist/Dragonchain-Qt.app/Contents/MacOS/dragonchaind \
+                   dist/Dragonchain-Qt.app/Contents/MacOS/dragonchain-cli \
+                   dist/Dragonchain-Qt.app/Contents/MacOS/dragonchain-tx; do
+            otool -L "$f" | grep -E '^/(opt/homebrew|usr/local/opt)' && echo "RESIDUAL: $f" || true
+          done
           # Build dmg + zip (self-contained 4-piece bundle)
           hdiutil create -volname "Dragonchain" -srcfolder dist -ov -format UDZO \
             "dragonchain-macos-$(uname -m).dmg"
@@ -239,9 +265,13 @@ jobs:
             echo '' | cc -x c -c -o /tmp/empty.o -
             ar rcs "$BOOST_ROOT/lib/libboost_system.a" /tmp/empty.o
           fi
+          export MACOSX_DEPLOYMENT_TARGET=11.0
+          export CFLAGS="-O2 -mmacosx-version-min=11.0"
+          export CXXFLAGS="-O2 -mmacosx-version-min=11.0"
+          export LDFLAGS="-mmacosx-version-min=11.0 $BDB_LIBS"
           ./configure --with-gui=qt5 --with-incompatible-bdb --disable-zmq --disable-tests \
             --with-boost="$BOOST_ROOT" \
-            CPPFLAGS="$BDB_CFLAGS" LDFLAGS="$BDB_LIBS"
+            CPPFLAGS="$BDB_CFLAGS" CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" LDFLAGS="$LDFLAGS"
           make -j$(sysctl -n hw.ncpu)
 
       - name: Package macOS .app + dmg
@@ -254,8 +284,17 @@ jobs:
           # Inject Qt frameworks + plugins and rewrite install names to @executable_path.
           # Produces dist/Dragonchain-Qt.app (self-contained, no Homebrew needed at runtime).
           python3 contrib/macdeploy/macdeployqtplus Dragonchain-Qt.app -verbose 2
-          # Add CLI daemons + Applications symlink + README into dist/
-          cp src/dragonchaind src/dragonchain-cli src/dragonchain-tx dist/
+          # Add CLI daemons INTO the .app so @executable_path/../Frameworks resolves,
+          # then rewrite their Homebrew absolute-path deps to the bundled Frameworks.
+          for b in dragonchaind dragonchain-cli dragonchain-tx; do
+            cp "src/$b" "dist/Dragonchain-Qt.app/Contents/MacOS/$b"
+            B="dist/Dragonchain-Qt.app/Contents/MacOS/$b"
+            for dep in $(otool -L "$B" | tail -n +2 | awk '{print $1}' | grep -E '^/(opt/homebrew|usr/local/opt)' || true); do
+              install_name_tool -change "$dep" \
+                "@executable_path/../Frameworks/$(basename "$dep")" "$B"
+            done
+            ln -sf "Dragonchain-Qt.app/Contents/MacOS/$b" "dist/$b"
+          done
           ln -sf /Applications dist/Applications
           printf '%s\n' \
             'Dragonchain macOS wallet (ad-hoc signed, un-notarized)' \
@@ -283,12 +322,25 @@ jobs:
           done
           echo "=== Qt3DInput.framework tree ==="
           find dist/Dragonchain-Qt.app/Contents/Frameworks/Qt3DInput.framework -maxdepth 3 | sort
-          # Ad-hoc sign everything
+          # Ad-hoc sign everything (--deep also covers the CLIs now inside the .app)
           codesign --force --deep --sign - dist/Dragonchain-Qt.app
-          for b in dragonchaind dragonchain-cli dragonchain-tx; do
-            codesign --force --sign - "dist/$b"
-          done
           codesign --verify --deep --verbose=2 dist/Dragonchain-Qt.app 2>&1 | tail -8 || true
+          # Verify minimum OS version is 11.0 (must NOT be 14.0/15.0 from the CI SDK)
+          echo "=== minos check (expect 11.0) ==="
+          for f in dist/Dragonchain-Qt.app/Contents/MacOS/Dragonchain-Qt \
+                   dist/Dragonchain-Qt.app/Contents/MacOS/dragonchaind \
+                   dist/Dragonchain-Qt.app/Contents/MacOS/dragonchain-cli \
+                   dist/Dragonchain-Qt.app/Contents/MacOS/dragonchain-tx; do
+            [ -f "$f" ] && printf '%-28s ' "$(basename "$f")" && (otool -l "$f" | grep -A3 LC_BUILD_VERSION | grep minos || echo no-minos)
+          done
+          # Verify no Homebrew absolute paths remain in any shipped binary
+          echo "=== Homebrew absolute-path check (expect no output) ==="
+          for f in dist/Dragonchain-Qt.app/Contents/MacOS/Dragonchain-Qt \
+                   dist/Dragonchain-Qt.app/Contents/MacOS/dragonchaind \
+                   dist/Dragonchain-Qt.app/Contents/MacOS/dragonchain-cli \
+                   dist/Dragonchain-Qt.app/Contents/MacOS/dragonchain-tx; do
+            otool -L "$f" | grep -E '^/(opt/homebrew|usr/local/opt)' && echo "RESIDUAL: $f" || true
+          done
           # Build dmg + zip (self-contained 4-piece bundle)
           hdiutil create -volname "Dragonchain" -srcfolder dist -ov -format UDZO \
             "dragonchain-macos-$(uname -m).dmg"
