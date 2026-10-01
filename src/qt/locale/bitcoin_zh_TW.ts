@@ -609,4 +609,17 @@
         <translation>金額顯示單位。可以點選其他單位。</translation>
     </message>
 </context>
+<context>
+    <name>SendCoinsDialog</name>
+    <message>
+        <location filename="../sendcoinsdialog.cpp" />
+        <source>Amount exceeds limit</source>
+        <translation>金額超出上限</translation>
+    </message>
+    <message>
+        <location filename="../sendcoinsdialog.cpp" />
+        <source>The total amount exceeds the maximum of 48,000 DRGN per transaction. Please split the transfer into multiple transactions of less than 48,000 DRGN each.</source>
+        <translation>轉帳總額超過單筆交易上限 48,000 DRGN，請拆分為多筆低於 48,000 DRGN 的交易分別發送。</translation>
+    </message>
+</context>
 </TS>

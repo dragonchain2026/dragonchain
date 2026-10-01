@@ -217,8 +217,8 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nTimeout = Consensus::BIP9Deployment::NO_TIMEOUT;
 
         // The best chain should have at least this much work.
-        // block 1900000 (2026-09-02)
-        consensus.nMinimumChainWork = uint256S("00000000000000000000000000000000000000000000000000000000a90476bd");
+        // block 2407460 (2026-10-01)
+        consensus.nMinimumChainWork = uint256S("00000000000000000000000000000000000000000000000000000000ecc77599");
 
         // By default assume that the signatures in ancestors of this block are valid.
         // TODO.SUGAR.UPDATE

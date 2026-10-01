@@ -1,7 +1,7 @@
 Dragonchain
 ===========
 
-**Version**: v0.6.4
+**Version**: v0.6.4.2
 **Genesis**: 2026-05-04 (Block Hash: `3c9761d390215d5e51843db7802845052ad8bdfad2014050b9cc6b82337089c2`)
 **Based on**: Sugarchain Yumekawa v0.16.3 (Bitcoin Core fork)
 
@@ -15,10 +15,10 @@ Pre-built binaries for Linux, macOS and Windows are available on the [Releases](
 
 | Platform | Binary |
 |----------|--------|
-| Linux x86_64 | [dragonchain-linux-x86_64.tar.gz](https://github.com/dragonchain2026/dragonchain/releases/download/v0.6.4.1/dragonchain-linux-x86_64.tar.gz) |
-| macOS arm64 | [dragonchain-macos-arm64.dmg](https://github.com/dragonchain2026/dragonchain/releases/download/v0.6.4.1/dragonchain-macos-arm64.dmg) |
-| macOS x86_64 (Intel) | [dragonchain-macos-x86_64.dmg](https://github.com/dragonchain2026/dragonchain/releases/download/v0.6.4.1/dragonchain-macos-x86_64.dmg) |
-| Windows x86_64 | [dragonchain-windows-x86_64.tar.gz](https://github.com/dragonchain2026/dragonchain/releases/download/v0.6.4.1/dragonchain-windows-x86_64.tar.gz) |
+| Linux x86_64 | [dragonchain-linux-x86_64.tar.gz](https://github.com/dragonchain2026/dragonchain/releases/download/v0.6.4.2/dragonchain-linux-x86_64.tar.gz) |
+| macOS arm64 | [dragonchain-macos-arm64.dmg](https://github.com/dragonchain2026/dragonchain/releases/download/v0.6.4.2/dragonchain-macos-arm64.dmg) |
+| macOS x86_64 (Intel) | [dragonchain-macos-x86_64.dmg](https://github.com/dragonchain2026/dragonchain/releases/download/v0.6.4.2/dragonchain-macos-x86_64.dmg) |
+| Windows x86_64 | [dragonchain-windows-x86_64.tar.gz](https://github.com/dragonchain2026/dragonchain/releases/download/v0.6.4.2/dragonchain-windows-x86_64.tar.gz) |
 
 The Linux and Windows archives contain `dragonchaind` (daemon), `dragonchain-cli` (CLI), `dragonchain-tx` and `dragonchain-qt` (GUI wallet).
 

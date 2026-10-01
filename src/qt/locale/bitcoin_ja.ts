@@ -609,4 +609,17 @@
         <translation>金額を表示する際の単位。クリックすることで他の単位を選択します。</translation>
     </message>
 </context>
+<context>
+    <name>SendCoinsDialog</name>
+    <message>
+        <location filename="../sendcoinsdialog.cpp" />
+        <source>Amount exceeds limit</source>
+        <translation>金額が上限を超えています</translation>
+    </message>
+    <message>
+        <location filename="../sendcoinsdialog.cpp" />
+        <source>The total amount exceeds the maximum of 48,000 DRGN per transaction. Please split the transfer into multiple transactions of less than 48,000 DRGN each.</source>
+        <translation>送金総額が1回の取引の上限である48,000 DRGNを超えています。48,000 DRGN未満の複数回の取引に分割してください。</translation>
+    </message>
+</context>
 </TS>

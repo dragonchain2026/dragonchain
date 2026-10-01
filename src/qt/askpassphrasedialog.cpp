@@ -167,7 +167,7 @@ void AskPassphraseDialog::accept()
         if(!model->setWalletEncrypted(false, oldpass))
         {
             QMessageBox::critical(this, tr("Wallet decryption failed"),
-                                  tr("The passphrase entered for the wallet decryption was incorrect."));
+                                  tr("This version does not support decrypting an encrypted wallet. Decryption is not available."));
         }
         else
         {

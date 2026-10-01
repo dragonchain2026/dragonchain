@@ -604,4 +604,17 @@
         <translation type="unfinished" />
     </message>
 </context>
+<context>
+    <name>SendCoinsDialog</name>
+    <message>
+        <location filename="../sendcoinsdialog.cpp" />
+        <source>Amount exceeds limit</source>
+        <translation>금액이 한도를 초과했습니다</translation>
+    </message>
+    <message>
+        <location filename="../sendcoinsdialog.cpp" />
+        <source>The total amount exceeds the maximum of 48,000 DRGN per transaction. Please split the transfer into multiple transactions of less than 48,000 DRGN each.</source>
+        <translation>총 송금액이 거래당 최대 48,000 DRGN 한도를 초과합니다. 48,000 DRGN 미만의 여러 거래로 나누어 보내주세요.</translation>
+    </message>
+</context>
 </TS>

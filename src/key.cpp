@@ -158,6 +158,8 @@ static int ec_privkey_export_der(const secp256k1_context *ctx, unsigned char *pr
 }
 
 bool CKey::Check(const unsigned char *vch) {
+    if (secp256k1_context_sign == nullptr)
+        return false;
     return secp256k1_ec_seckey_verify(secp256k1_context_sign, vch);
 }
 
@@ -259,12 +261,15 @@ CPubKey CKey::GetPubKey() const {
 bool CKey::Sign(const uint256 &hash, std::vector<unsigned char>& vchSig, bool grind, uint32_t test_case) const {
     if (!fValid)
         return false;
-    size_t sig_len;
+    size_t sig_len = 0;
     vchSig.resize(PQCLEAN_FALCON512_CLEAN_CRYPTO_BYTES_);
-    int r = PQCLEAN_FALCON512_CLEAN_crypto_sign_signature(vchSig.data(),&sig_len,hash.begin() ,32,keydata.data());
+    int r = PQCLEAN_FALCON512_CLEAN_crypto_sign_signature(vchSig.data(), &sig_len, hash.begin(), 32, keydata.data());
+    if (r != 0 || sig_len == 0 || sig_len > PQCLEAN_FALCON512_CLEAN_CRYPTO_BYTES_) {
+        vchSig.clear();
+        return false;
+    }
     vchSig.resize(sig_len);
-
-    return (r == 0);
+    return true;
 }
 
 bool CKey::VerifyPubKey(const CPubKey& pubkey) const {
@@ -274,27 +279,33 @@ bool CKey::VerifyPubKey(const CPubKey& pubkey) const {
     uint256 hash;
     CHash256().Write((unsigned char*)str.data(), str.size()).Write(rnd, sizeof(rnd)).Finalize(hash.begin());
     std::vector<unsigned char> vchSig;
-    Sign(hash, vchSig);
+    if (!Sign(hash, vchSig))
+        return false;
     return pubkey.Verify(hash, vchSig);
 }
 
 bool CKey::SignCompact(const uint256 &hash, std::vector<unsigned char>& vchSig) const {
     if (!fValid)
         return false;
-    size_t sig_len;
+    size_t sig_len = 0;
     vchSig.resize(PQCLEAN_FALCON512_CLEAN_CRYPTO_BYTES_+pksize());
-    int r = PQCLEAN_FALCON512_CLEAN_crypto_sign_signature(vchSig.data(),&sig_len,hash.begin(),32,keydata.data());
-    if (r != 0) {
+    int r = PQCLEAN_FALCON512_CLEAN_crypto_sign_signature(vchSig.data(), &sig_len, hash.begin(), 32, keydata.data());
+    if (r != 0 || sig_len == 0 || sig_len > PQCLEAN_FALCON512_CLEAN_CRYPTO_BYTES_) {
+        vchSig.clear();
         return false;
     }
     vchSig.resize(sig_len+pksize());
-    memcpy(vchSig.data()+sig_len,pubkeydata.data(),pksize());
+    memcpy(vchSig.data()+sig_len, pubkeydata.data(), pksize());
 
     return true;
 }
 
 bool CKey::Load(const CPrivKey &privkey, const CPubKey &vchPubKey, bool fSkipCheck=false) {
     if (privkey.size() != PRIVATE_KEY_SIZE) {
+        fValid = false;
+        return false;
+    }
+    if (!vchPubKey.IsValid()) {
         fValid = false;
         return false;
     }
@@ -316,6 +327,8 @@ bool CKey::Derive(CKey& keyChild, ChainCode &ccChild, unsigned int nChild, const
     // BIP32 derivation only works with secp256k1 32-byte keys
     // Falcon-512 uses 1281-byte keys and is incompatible with BIP32 HD derivation
     if (size() != 32)
+        return false;
+    if (secp256k1_context_sign == nullptr)
         return false;
     std::vector<unsigned char, secure_allocator<unsigned char>> vout(64);
     if ((nChild >> 31) == 0) {

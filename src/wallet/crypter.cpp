@@ -182,7 +182,7 @@ bool CCryptoKeyStore::Unlock(const CKeyingMaterial& vMasterKeyIn)
             return false;
 
         bool keyPass = false;
-        bool keyFail = false;
+        int nKeyFail = 0;
         CryptedKeyMap::const_iterator mi = mapCryptedKeys.begin();
         for (; mi != mapCryptedKeys.end(); ++mi)
         {
@@ -191,20 +191,27 @@ bool CCryptoKeyStore::Unlock(const CKeyingMaterial& vMasterKeyIn)
             CKey key;
             if (!DecryptKey(vMasterKeyIn, vchCryptedSecret, vchPubKey, key))
             {
-                keyFail = true;
-                break;
+                nKeyFail++;
+                LogPrintf("%s: key %s failed to decrypt; skipping (corrupt key, its coins remain inaccessible).\n",
+                          __func__, vchPubKey.GetID().ToString());
+                continue;
             }
             keyPass = true;
             if (fDecryptionThoroughlyChecked)
                 break;
         }
-        if (keyPass && keyFail)
+        // If not a single key decrypted, the passphrase is wrong. If only some
+        // failed, the wallet has corrupt keys: unlock anyway and warn, rather
+        // than refusing to open the wallet at all.
+        if (!keyPass)
         {
-            LogPrintf("The wallet is probably corrupted: Some keys decrypt but not all.\n");
-            assert(false);
-        }
-        if (keyFail || !keyPass)
+            LogPrintf("%s: passphrase failed to decrypt any key (%d keys attempted).\n", __func__, nKeyFail);
             return false;
+        }
+        if (nKeyFail > 0)
+        {
+            LogPrintf("The wallet is corrupted: %d key(s) could not be decrypted. Unlocked anyway; affected coins are not spendable.\n", nKeyFail);
+        }
         vMasterKey = vMasterKeyIn;
         fDecryptionThoroughlyChecked = true;
     }
@@ -240,6 +247,11 @@ bool CCryptoKeyStore::AddCryptedKey(const CPubKey &vchPubKey, const std::vector<
 {
     LOCK(cs_KeyStore);
     if (!SetCrypted()) {
+        return false;
+    }
+
+    if (!vchPubKey.IsValid()) {
+        LogPrintf("%s: refusing to store crypted key with invalid pubkey.\n", __func__);
         return false;
     }
 
@@ -313,7 +325,15 @@ bool CCryptoKeyStore::EncryptKeys(CKeyingMaterial& vMasterKeyIn)
     for (KeyMap::value_type& mKey : mapKeys)
     {
         const CKey &key = mKey.second;
+        if (!key.IsValid()) {
+            LogPrintf("%s: skipping invalid key (will not be encrypted).\n", __func__);
+            continue;
+        }
         CPubKey vchPubKey = key.GetPubKey();
+        if (!vchPubKey.IsValid()) {
+            LogPrintf("%s: skipping key with invalid pubkey (will not be encrypted).\n", __func__);
+            continue;
+        }
         CKeyingMaterial vchSecret(key.begin(), key.end());
         std::vector<unsigned char> vchCryptedSecret;
         if (!EncryptSecret(vMasterKeyIn, vchSecret, vchPubKey.GetHash(), vchCryptedSecret))

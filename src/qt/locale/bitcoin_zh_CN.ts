@@ -609,4 +609,132 @@
         <translation>金额单位。单击选择别的单位。</translation>
     </message>
 </context>
+<context>
+    <name>SendCoinsDialog</name>
+    <message>
+        <location filename="../sendcoinsdialog.cpp" />
+        <source>Amount exceeds limit</source>
+        <translation>金额超出上限</translation>
+    </message>
+    <message>
+        <location filename="../sendcoinsdialog.cpp" />
+        <source>The total amount exceeds the maximum of 48,000 DRGN per transaction. Please split the transfer into multiple transactions of less than 48,000 DRGN each.</source>
+        <translation>转账总额超过单笔交易上限 48,000 DRGN，请拆分为多笔低于 48,000 DRGN 的交易分别发送。</translation>
+    </message>
+</context>
+<context>
+    <name>AskPassphraseDialog</name>
+    <message>
+        <source>Passphrase Dialog</source>
+        <translation>密码对话框</translation>
+    </message>
+    <message>
+        <source>Enter passphrase</source>
+        <translation>输入密码</translation>
+    </message>
+    <message>
+        <source>New passphrase</source>
+        <translation>新密码</translation>
+    </message>
+    <message>
+        <source>Repeat new passphrase</source>
+        <translation>重复输入新密码</translation>
+    </message>
+    <message>
+        <source>Show password</source>
+        <translation>显示密码</translation>
+    </message>
+    <message>
+        <source>Enter the new passphrase to the wallet.&lt;br/&gt;Please use a passphrase of &lt;b&gt;ten or more random characters&lt;/b&gt;, or &lt;b&gt;eight or more words&lt;/b&gt;.</source>
+        <translation>请输入新的钱包密码。&lt;br/&gt;请使用由&lt;b&gt;十个或更多随机字符&lt;/b&gt;或&lt;b&gt;八个或更多单词&lt;/b&gt;组成的密码。</translation>
+    </message>
+    <message>
+        <source>Encrypt wallet</source>
+        <translation>加密钱包</translation>
+    </message>
+    <message>
+        <source>This operation needs your wallet passphrase to unlock the wallet.</source>
+        <translation>此操作需要输入钱包密码以解锁钱包。</translation>
+    </message>
+    <message>
+        <source>Unlock wallet</source>
+        <translation>解锁钱包</translation>
+    </message>
+    <message>
+        <source>This operation needs your wallet passphrase to decrypt the wallet.</source>
+        <translation>此操作需要输入钱包密码以解密钱包。</translation>
+    </message>
+    <message>
+        <source>Decrypt wallet</source>
+        <translation>解密钱包</translation>
+    </message>
+    <message>
+        <source>Change passphrase</source>
+        <translation>修改密码</translation>
+    </message>
+    <message>
+        <source>Enter the old passphrase and new passphrase to the wallet.</source>
+        <translation>请输入钱包的旧密码和新密码。</translation>
+    </message>
+    <message>
+        <source>Confirm wallet encryption</source>
+        <translation>确认钱包加密</translation>
+    </message>
+    <message>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR DRAGONCHAINS&lt;/b&gt;!</source>
+        <translation>警告：如果加密钱包后又丢失了密码，您将&lt;b&gt;丢失全部龙链币&lt;/b&gt;！</translation>
+    </message>
+    <message>
+        <source>Are you sure you wish to encrypt your wallet?</source>
+        <translation>您确定要加密您的钱包吗？</translation>
+    </message>
+    <message>
+        <source>Wallet encrypted</source>
+        <translation>钱包已加密</translation>
+    </message>
+    <message>
+        <source>%1 will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your dragonchains from being stolen by malware infecting your computer.</source>
+        <translation>%1 现在将关闭以完成加密过程。请记住，加密钱包无法完全防止您的龙链币被感染计算机的恶意软件盗取。</translation>
+    </message>
+    <message>
+        <source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. For security reasons, previous backups of the unencrypted wallet file will become useless as soon as you start using the new, encrypted wallet.</source>
+        <translation>重要提示：您之前对钱包文件所做的任何备份都应替换为新生成的加密钱包文件。出于安全考虑，一旦开始使用新的加密钱包，之前未加密钱包文件的备份将立即失效。</translation>
+    </message>
+    <message>
+        <source>Wallet encryption failed</source>
+        <translation>钱包加密失败</translation>
+    </message>
+    <message>
+        <source>Wallet encryption failed due to an internal error. Your wallet was not encrypted.</source>
+        <translation>因内部错误导致钱包加密失败，您的钱包未被加密。</translation>
+    </message>
+    <message>
+        <source>The supplied passphrases do not match.</source>
+        <translation>两次输入的密码不一致。</translation>
+    </message>
+    <message>
+        <source>Wallet unlock failed</source>
+        <translation>钱包解锁失败</translation>
+    </message>
+    <message>
+        <source>The passphrase entered for the wallet decryption was incorrect.</source>
+        <translation>输入的钱包密码不正确。</translation>
+    </message>
+    <message>
+        <source>Wallet decryption failed</source>
+        <translation>钱包解密失败</translation>
+    </message>
+    <message>
+        <source>This version does not support decrypting an encrypted wallet. Decryption is not available.</source>
+        <translation>本版本不支持解密已加密的钱包，解密功能不可用。</translation>
+    </message>
+    <message>
+        <source>Wallet passphrase was successfully changed.</source>
+        <translation>钱包密码修改成功。</translation>
+    </message>
+    <message>
+        <source>Warning: The Caps Lock key is on!</source>
+        <translation>警告：大写锁定键已开启！</translation>
+    </message>
+</context>
 </TS>

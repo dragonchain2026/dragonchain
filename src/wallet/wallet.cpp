@@ -166,8 +166,9 @@ CPubKey CWallet::GenerateNewKey(CWalletDB &walletdb, bool internal)
     if (!pubkey.IsValid()) {
         throw std::runtime_error(std::string(__func__) + ": Generated pubkey is not valid");
     }
-    // Disable VerifyPubKey check for Falcon-512 to avoid potential crashes
-    // assert(secret.VerifyPubKey(pubkey));
+    if (!secret.VerifyPubKey(pubkey)) {
+        throw std::runtime_error(std::string(__func__) + ": Generated key failed self-verification");
+    }
 
     mapKeyMetadata[pubkey.GetID()] = metadata;
     UpdateTimeFirstKey(nCreationTime);
@@ -413,7 +414,7 @@ bool CWallet::ChangeWalletPassphrase(const SecureString& strOldWalletPassphrase,
             if(!crypter.SetKeyFromPassphrase(strOldWalletPassphrase, pMasterKey.second.vchSalt, pMasterKey.second.nDeriveIterations, pMasterKey.second.nDerivationMethod))
                 return false;
             if (!crypter.Decrypt(pMasterKey.second.vchCryptedKey, _vMasterKey))
-                return false;
+                continue;
             if (CCryptoKeyStore::Unlock(_vMasterKey))
             {
                 int64_t nStartTime = GetTimeMillis();
@@ -3057,7 +3058,10 @@ bool CWallet::CommitTransaction(CWalletTx& wtxNew, CReserveKey& reservekey, CCon
             // Broadcast
             if (!wtx.AcceptToMemoryPool(maxTxFee, state)) {
                 LogPrintf("CommitTransaction(): Transaction cannot be broadcast immediately, %s\n", state.GetRejectReason());
-                // TODO: if we expect the failure to be long term or permanent, instead delete wtx from the wallet and return failure.
+                // Report the broadcast failure to the caller (GUI/RPC) instead of
+                // silently returning success. The tx stays in the wallet as
+                // unconfirmed so the user can retry or abandon it.
+                return false;
             } else {
                 wtx.RelayWalletTransaction(connman);
             }

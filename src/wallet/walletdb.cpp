@@ -409,8 +409,11 @@ ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue,
             ssKey >> vchPubKey;
             if (!vchPubKey.IsValid())
             {
-                strErr = "Error reading wallet database: CPubKey corrupt";
-                return false;
+                // Downgrade: skip this single corrupt ckey instead of failing
+                // the whole wallet load. The affected coins stay inaccessible,
+                // but the wallet still opens.
+                strErr = strprintf("Skipping corrupt ckey record (invalid pubkey); its coins are inaccessible.");
+                return true;
             }
             std::vector<unsigned char> vchPrivKey;
             ssValue >> vchPrivKey;
@@ -418,8 +421,8 @@ ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue,
 
             if (!pwallet->LoadCryptedKey(vchPubKey, vchPrivKey))
             {
-                strErr = "Error reading wallet database: LoadCryptedKey failed";
-                return false;
+                strErr = strprintf("Skipping ckey record (LoadCryptedKey failed); its coins are inaccessible.");
+                return true;
             }
             wss.fIsEncrypted = true;
         }

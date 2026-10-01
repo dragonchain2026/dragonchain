@@ -241,6 +241,19 @@ void SendCoinsDialog::on_sendButton_clicked()
         return;
     }
 
+    // Cap the total of a single transaction at 48000 DRGN so it stays under
+    // the MAX_STANDARD_TX_SIGOPS_COST witness-sigop wall (bech32 = 1 sigop/input).
+    CAmount nTotalAmount = 0;
+    for (const SendCoinsRecipient &rcp : recipients) {
+        nTotalAmount += rcp.amount;
+    }
+    if (nTotalAmount > 48000 * COIN) {
+        QMessageBox::warning(this, tr("Amount exceeds limit"),
+            tr("The total amount exceeds the maximum of 48,000 DRGN per transaction. Please split the transfer into multiple transactions of less than 48,000 DRGN each."),
+            QMessageBox::Ok);
+        return;
+    }
+
     fNewRecipientAllowed = false;
     WalletModel::UnlockContext ctx(model->requestUnlock());
     if(!ctx.isValid())

@@ -56,7 +56,9 @@ PQCLEAN_FALCON512_CLEAN_crypto_sign_keypair(unsigned char *pk, unsigned char *sk
     /*
      * Generate key pair.
      */
-    randombytes(seed, sizeof seed);
+    if (randombytes(seed, sizeof seed) != 0) {
+        return -1;
+    }
     inner_shake256_init(&rng);
     inner_shake256_inject(&rng, seed, sizeof seed);
     inner_shake256_flip(&rng);
@@ -176,7 +178,9 @@ do_sign(uint8_t *nonce, uint8_t *sigbuf, size_t *sigbuflen,
     /*
      * Create a random nonce (40 bytes).
      */
-    randombytes(nonce, NONCELEN);
+    if (randombytes(nonce, NONCELEN) != 0) {
+        return -1;
+    }
 
     /*
      * Hash message nonce + message into a vector.
@@ -191,7 +195,9 @@ do_sign(uint8_t *nonce, uint8_t *sigbuf, size_t *sigbuflen,
     /*
      * Initialize a RNG.
      */
-    randombytes(seed, sizeof seed);
+    if (randombytes(seed, sizeof seed) != 0) {
+        return -1;
+    }
     inner_shake256_init(&sc);
     inner_shake256_inject(&sc, seed, sizeof seed);
     inner_shake256_flip(&sc);
